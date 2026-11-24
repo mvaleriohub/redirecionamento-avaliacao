@@ -3,7 +3,7 @@ Desenvolvido por Miguel Valério (mvaleriohub)
 24/11/2026 -- (11/24/2026)
 */
 
-const urlSupabase = 'https://ykkabkalndjqcyugkaxm.supabase.co/rest/v1/'
+const urlSupabase = 'https://ykkabkalndjqcyugkaxm.supabase.co'
 const chavePublica = 'sb_publishable_nAGuOOBLvX5CE0A4ICRQnA_gX3sU4J9'
 const paginaPadrao = 'https://google.com'
 
