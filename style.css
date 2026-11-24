@@ -1,0 +1,193 @@
+@charset "UTF-8";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap'); /* Fonte */
+
+:root {
+    --font-display: 'Inter', sans-serif;
+    --font-color: #1f2933;
+    --font-color-reverse: #ffffff;
+    --background: #f4f6f8;
+    --background2: #ffffff;
+    --primary: #0f766e;
+    --secundary: #64748b;
+    --erro: #b42318;
+    --sucesso: #15803d;
+    --borda: #d5dbe1;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: var(--font-color);
+    font-family: var(--font-display);
+}
+
+body {
+    background: var(--background);
+}
+
+/* !important porque os ids de formulário definem display próprio */
+.oculto {
+    display: none !important;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: var(--primary);
+}
+
+header > h1 {
+    font-size: 20px;
+    color: var(--font-color-reverse);
+}
+
+header > h1 > span {
+    font-weight: 400;
+    color: var(--font-color-reverse);
+}
+
+main {
+    padding: 16px;
+}
+
+/* Formulários */
+main form {
+    display: grid;
+    gap: 12px;
+    padding: 20px;
+    background: var(--background2);
+    border-radius: 12px;
+}
+
+main label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+main input {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    background: var(--background2);
+}
+
+button {
+    padding: 12px 16px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: var(--primary);
+    color: var(--font-color-reverse);
+}
+
+header > button {
+    background: rgba(0, 0, 0, 0.25);
+}
+
+#cancelar,
+#gerarCodigo {
+    background: var(--secundary);
+}
+
+.erro {
+    color: var(--erro);
+}
+
+/* Login */
+#login > form {
+    margin-top: 40px;
+}
+
+/* Painel */
+#mensagem {
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: var(--sucesso);
+}
+
+#mensagem.erro {
+    color: var(--erro);
+}
+
+#barra {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+#barra > input {
+    flex: 1;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    background: var(--background2);
+}
+
+#editor {
+    margin-bottom: 16px;
+}
+
+.linha {
+    display: flex;
+    gap: 8px;
+}
+
+.linha > input {
+    flex: 1;
+}
+
+.linha > button {
+    flex: 1;
+}
+
+.linha > #gerarCodigo {
+    flex: 0 0 auto;
+}
+
+.opcao {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.opcao > input {
+    width: auto;
+}
+
+/* Lista */
+#lista {
+    display: grid;
+    gap: 8px;
+    list-style: none;
+}
+
+#lista > li {
+    display: grid;
+    gap: 2px;
+    padding: 14px;
+    background: var(--background2);
+    border-left: 6px solid var(--borda);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#lista > li.ativa {
+    border-left-color: var(--sucesso);
+}
+
+#lista > li.inativa {
+    border-left-color: var(--secundary);
+}
+
+#lista > li > small {
+    color: var(--secundary);
+}

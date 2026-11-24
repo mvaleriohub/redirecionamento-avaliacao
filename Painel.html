@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Painel de Placas</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="medias-queries.css">
+    <script src="painel.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>Painel de <span>Placas</span></h1>
+        <button id="sair" class="oculto">Sair</button>
+    </header>
+    <main>
+        <section id="login">
+            <form id="formLogin">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" autocomplete="username" required>
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" autocomplete="current-password" required>
+                <button type="submit">Entrar</button>
+                <p id="erroLogin" class="erro"></p>
+            </form>
+        </section>
+        <section id="painel" class="oculto">
+            <p id="mensagem"></p>
+            <div id="barra">
+                <input type="search" id="busca" placeholder="Buscar por código ou cliente">
+                <button id="novaPlaca">Nova</button>
+            </div>
+            <form id="editor" class="oculto">
+                <label for="campoCodigo">Código</label>
+                <div class="linha">
+                    <input type="text" id="campoCodigo" maxlength="12" autocapitalize="off" autocomplete="off">
+                    <button type="button" id="gerarCodigo">Gerar</button>
+                </div>
+                <label for="campoCliente">Cliente</label>
+                <input type="text" id="campoCliente" autocomplete="off">
+                <label for="campoLink">Link de avaliação</label>
+                <input type="url" id="campoLink" placeholder="https://...">
+                <label class="opcao"><input type="checkbox" id="campoAtiva"> Placa ativa</label>
+                <label for="campoData">Data da venda</label>
+                <input type="date" id="campoData">
+                <div class="linha">
+                    <button type="submit">Salvar</button>
+                    <button type="button" id="cancelar">Cancelar</button>
+                </div>
+            </form>
+            <ul id="lista"></ul>
+        </section>
+    </main>
+</body>
+</html>

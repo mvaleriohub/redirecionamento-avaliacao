@@ -3,22 +3,18 @@ Desenvolvido por Miguel Valério (mvaleriohub)
 24/11/2026 -- (11/24/2026)
 */
 
-const urlSupabase = 'https://ykkabkalndjqcyugkaxm.supabase.co'
-const chavePublica = 'sb_publishable_nAGuOOBLvX5CE0A4ICRQnA_gX3sU4J9'
+const urlSupabase = 'https://tzkiyfafjivsujrhzhsb.supabase.co'
+const chavePublica = 'sb_publishable_8pqTFeUWFOYTjGw0HmqT-Q_KbBfgsgY'
 const paginaPadrao = 'https://google.com'
 
 async function buscarDestino(codigo) {
   const controle = new AbortController()
-  const limite = setTimeout(() => controle.abort(), 5000)
+  const limite = setTimeout(() => controle.abort(), 4000)
 
   try {
-    const resposta = await fetch(`${urlSupabase}/rest/v1/rpc/obter_destino`, {
-      method: 'POST',
-      headers: {
-        'apikey': chavePublica,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ p_codigo: codigo }),
+    // GET (a função é stable): sem corpo JSON e sem Content-Type, o navegador negocia menos coisa
+    const resposta = await fetch(`${urlSupabase}/rest/v1/rpc/obter_destino?p_codigo=${codigo}`, {
+      headers: {'apikey': chavePublica},
       signal: controle.signal
     })
 
