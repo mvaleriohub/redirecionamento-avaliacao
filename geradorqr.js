@@ -16,6 +16,10 @@ function urlDaPlaca(codigo) {
 }
 
 function criarSvgQr(codigo) {
+  if (typeof qrcode == 'undefined') {
+    throw new Error('o arquivo qrcode.js não carregou; confira se ele está no repositório')
+  }
+
   const qr = qrcode(0, 'Q') // correção de erro Q: aguenta placa riscada ou gasta
   qr.addData(urlDaPlaca(codigo))
   qr.make()

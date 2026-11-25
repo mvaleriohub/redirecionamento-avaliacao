@@ -133,7 +133,7 @@ function avisar(texto, erro = false) {
   Mensagem.classList.toggle('erro', erro)
   setTimeout(() => {
     Mensagem.textContent = ''
-  }, 4000)
+  }, 8000)
 }
 
 function hoje() {
@@ -259,7 +259,16 @@ function abrirEditor(codigo) {
 function mostrarPreviaQr(codigo) {
   PreviaQr.classList.toggle('oculto', codigo == null)
   BaixarQr.classList.toggle('oculto', codigo == null)
-  PreviaQr.innerHTML = codigo == null ? '' : criarSvgQr(codigo) // o svg é montado aqui com um código já validado
+  PreviaQr.innerHTML = ''
+
+  if (codigo == null) return
+
+  // o svg é montado aqui com um código já validado; se falhar, o editor continua abrindo normalmente
+  try {
+    PreviaQr.innerHTML = criarSvgQr(codigo)
+  } catch (erro) {
+    avisar(`Sem prévia do QR: ${erro.message}`, true)
+  }
 }
 
 function fecharEditor() {
@@ -442,7 +451,7 @@ async function baixarQrAtual() {
   try {
     await baixarQr(editando, FormatoQr.value)
   } catch (erro) {
-    avisar('Erro ao gerar o QR.', true)
+    avisar(`Erro ao gerar o QR: ${erro.message}`, true)
   }
 }
 
@@ -461,7 +470,7 @@ async function baixarQrsDaLista() {
     await baixarLoteQr(codigos, FormatoQr.value)
     avisar(`${codigos.length} QRs baixados em um ZIP.`)
   } catch (erro) {
-    avisar('Erro ao gerar os QRs.', true)
+    avisar(`Erro ao gerar os QRs: ${erro.message}`, true)
   } finally {
     BaixarLote.disabled = false
     BaixarLote.textContent = 'Baixar QRs da lista (ZIP)'
