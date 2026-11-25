@@ -5,7 +5,7 @@ Desenvolvido por Miguel Valério (mvaleriohub)
 
 const urlSupabase = 'https://tzkiyfafjivsujrhzhsb.supabase.co'
 const chavePublica = 'sb_publishable_8pqTFeUWFOYTjGw0HmqT-Q_KbBfgsgY'
-const paginaPadrao = 'https://google.com'
+const paginaErro = '404.html'
 
 async function buscarDestino(codigo) {
   const controle = new AbortController()
@@ -32,7 +32,7 @@ async function redirecionar() {
   const codigo = new URLSearchParams(location.search).get('c')
 
   if (!codigo || !/^[a-z0-9]{3,12}$/.test(codigo)) {
-    location.replace(paginaPadrao)
+    location.replace(paginaErro)
     return
   }
 
@@ -42,7 +42,8 @@ async function redirecionar() {
   if (typeof destino == 'string' && destino.startsWith('https://')) {
     location.replace(destino)
   } else {
-    location.replace(paginaPadrao)
+    // leva o código junto: é ele que faz a 404 mostrar a opção de falar no WhatsApp
+    location.replace(`${paginaErro}?c=${codigo}`)
   }
 }
 
