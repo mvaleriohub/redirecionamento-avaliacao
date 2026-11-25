@@ -8,10 +8,19 @@
 /* Tablet */
 @media screen and (min-width: 768px) {
     main {max-width: 640px; padding-top: 56px;}
-    #erro > picture {max-width: 420px; padding: 16px;}
-    #erro > h1 {font-size: 32px;}
-    #erro > #placa > #confirmar {width: auto;}
-    #erro > #placa > #resposta > a {width: auto;}
+    #erro > picture {max-width: 420px;}
+    #erro > #texto > h1 {font-size: 32px;}
+    #erro > #texto > #placa > #confirmar {width: auto;}
+    #erro > #texto > #placa > #resposta > a {width: auto;}
+}
+
+/* Desktop: texto de um lado e mascote do outro */
+@media screen and (min-width: 900px) {
+    main {display: grid; align-items: center; max-width: 1040px; min-height: calc(100vh - 4px); padding-top: 24px;}
+    #erro {grid-template-columns: 1fr 1fr; align-items: center; gap: 48px; text-align: left;}
+    #erro > picture {order: 2; max-width: 480px; justify-self: center;}
+    #erro > #texto {justify-items: start; align-content: center;}
+    #erro > #texto > #placa {justify-items: start; text-align: left;}
 }
 
 /* Reduzir movimento, se o sistema pedir */
