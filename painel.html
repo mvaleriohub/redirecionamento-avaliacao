@@ -29,8 +29,25 @@
             <p id="mensagem"></p>
             <div id="barra">
                 <input type="search" id="busca" placeholder="Buscar por código ou cliente">
-                <button id="novaPlaca">Nova</button>
+                <select id="filtro">
+                    <option value="ativas">Ativas</option>
+                    <option value="lote">Em lote</option>
+                    <option value="inativas">Inativas</option>
+                    <option value="todas">Todas</option>
+                </select>
             </div>
+            <div id="acoes">
+                <button id="novaPlaca">Cadastrar direto</button>
+                <button id="novoLote">Cadastrar lote inativo</button>
+            </div>
+            <form id="formLote" class="oculto">
+                <label for="campoQuantidade">Quantidade de placas</label>
+                <input type="number" id="campoQuantidade" min="1" max="100" value="10">
+                <div class="linha">
+                    <button type="submit">Gerar lote</button>
+                    <button type="button" id="cancelarLote">Cancelar</button>
+                </div>
+            </form>
             <form id="editor" class="oculto">
                 <label for="campoCodigo">Código</label>
                 <div class="linha">

@@ -23,6 +23,11 @@ const CampoAtiva = document.getElementById('campoAtiva')
 const CampoData = document.getElementById('campoData')
 const GerarCodigo = document.getElementById('gerarCodigo')
 const Cancelar = document.getElementById('cancelar')
+const Filtro = document.getElementById('filtro')
+const NovoLote = document.getElementById('novoLote')
+const FormLote = document.getElementById('formLote')
+const CampoQuantidade = document.getElementById('campoQuantidade')
+const CancelarLote = document.getElementById('cancelarLote')
 
 const RotuloLink = document.getElementById('rotuloLink')
 const TrocarModo = document.getElementById('trocarModo')
@@ -131,7 +136,7 @@ function hoje() {
 
 // ----- Lista -----
 async function carregarPlacas() {
-  const resposta = await requisicao('/rest/v1/placas?select=*&order=criado_em.desc')
+  const resposta = await requisicao('/rest/v1/placas?select=*&order=criado_em.desc,codigo.asc')
 
   if (!resposta) return
 
@@ -144,13 +149,30 @@ async function carregarPlacas() {
   mostrarLista()
 }
 
+// ativa; lote (inativa e sem cliente nem link, ainda não vendida); inativa (já teve dados, foi desativada)
+function estadoDaPlaca(placa) {
+  if (placa.ativa) return 'ativa'
+  if (!placa.cliente && !placa.link_avaliacao) return 'lote'
+  return 'inativa'
+}
+
+function passaFiltro(placa) {
+  if (Filtro.value == 'todas') return true
+
+  const estados = {ativas: 'ativa', lote: 'lote', inativas: 'inativa'}
+  return estadoDaPlaca(placa) == estados[Filtro.value]
+}
+
 function mostrarLista() {
   const termo = Busca.value.trim().toLowerCase()
   Lista.replaceChildren()
 
   for (const placa of placas) {
     const texto = `${placa.codigo} ${placa.cliente || ''}`.toLowerCase()
+
+    // buscando, o filtro é ignorado: assim achar uma placa em lote ou inativa não depende do filtro
     if (termo && !texto.includes(termo)) continue
+    if (!termo && !passaFiltro(placa)) continue
 
     const item = document.createElement('li')
     const codigo = document.createElement('strong')
@@ -159,8 +181,8 @@ function mostrarLista() {
 
     codigo.textContent = placa.codigo
     cliente.textContent = placa.cliente || 'Sem cliente'
-    estado.textContent = placa.ativa ? 'Ativa' : 'Inativa'
-    item.classList.add(placa.ativa ? 'ativa' : 'inativa')
+    estado.textContent = {ativa: 'Ativa', lote: 'Em lote', inativa: 'Inativa'}[estadoDaPlaca(placa)]
+    item.classList.add(estadoDaPlaca(placa))
     item.append(codigo, cliente, estado)
     item.addEventListener('click', () => abrirEditor(placa.codigo))
     Lista.appendChild(item)
@@ -168,7 +190,7 @@ function mostrarLista() {
 
   if (!Lista.children.length) {
     const vazio = document.createElement('li')
-    vazio.textContent = 'Nenhuma placa encontrada.'
+    vazio.textContent = 'Nenhuma placa neste filtro.'
     Lista.appendChild(vazio)
   }
 }
@@ -211,9 +233,11 @@ function abrirEditor(codigo) {
     CampoLink.value = ''
   }
 
-  CampoAtiva.checked = placa ? placa.ativa : false
+  // placa em lote sendo cadastrada: já vem marcada como ativa, é a venda
+  CampoAtiva.checked = placa ? placa.ativa || estadoDaPlaca(placa) == 'lote' : false
   // data de hoje sempre que não houver uma data guardada (placa nova ou sem data)
   CampoData.value = placa && placa.data_venda ? placa.data_venda : hoje()
+  FormLote.classList.add('oculto')
   Editor.classList.remove('oculto')
   Editor.scrollIntoView({behavior: 'smooth'})
 }
@@ -223,18 +247,74 @@ function fecharEditor() {
   editando = null
 }
 
-function gerarCodigo() {
+function sortearCodigo() {
   const letras = 'abcdefghjkmnpqrstuvwxyz23456789' // sem i, l, o, 0 e 1 para não confundir na leitura
+  let codigo = ''
+
+  for (let i = 0; i < 4; i++) {
+    codigo += letras[Math.floor(Math.random() * letras.length)]
+  }
+
+  return codigo
+}
+
+function gerarCodigo() {
   let novo
 
   do {
-    novo = ''
-    for (let i = 0; i < 4; i++) {
-      novo += letras[Math.floor(Math.random() * letras.length)]
-    }
+    novo = sortearCodigo()
   } while (placas.some((p) => p.codigo == novo))
 
   CampoCodigo.value = novo
+}
+
+// ----- Lote -----
+function abrirLote() {
+  Editor.classList.add('oculto')
+  editando = null
+  FormLote.classList.remove('oculto')
+  CampoQuantidade.focus()
+}
+
+async function gerarLote(evento) {
+  evento.preventDefault()
+
+  const quantidade = parseInt(CampoQuantidade.value)
+
+  if (!quantidade || quantidade < 1 || quantidade > 100) {
+    avisar('Quantidade: de 1 a 100.', true)
+    return
+  }
+
+  const usados = new Set(placas.map((p) => p.codigo))
+  const novas = []
+
+  while (novas.length < quantidade) {
+    const codigo = sortearCodigo()
+    if (usados.has(codigo)) continue
+
+    usados.add(codigo)
+    novas.push({codigo: codigo, ativa: false})
+  }
+
+  const resposta = await requisicao('/rest/v1/placas', {
+    method: 'POST',
+    headers: {'Prefer': 'return=minimal'},
+    body: JSON.stringify(novas)
+  })
+
+  if (!resposta) return
+
+  if (!resposta.ok) {
+    // 409 aqui é um código repetido de uma lista desatualizada: gerar de novo resolve
+    avisar('Erro ao gerar o lote. Tente de novo.', true)
+    return
+  }
+
+  avisar(`${quantidade} placas criadas em lote.`)
+  FormLote.classList.add('oculto')
+  Filtro.value = 'lote'
+  await carregarPlacas()
 }
 
 async function salvarPlaca(evento) {
@@ -366,6 +446,10 @@ Sair.addEventListener('click', encerrarSessao)
 Busca.addEventListener('input', mostrarLista)
 NovaPlaca.addEventListener('click', () => abrirEditor(''))
 GerarCodigo.addEventListener('click', gerarCodigo)
+NovoLote.addEventListener('click', abrirLote)
+CancelarLote.addEventListener('click', () => FormLote.classList.add('oculto'))
+FormLote.addEventListener('submit', gerarLote)
+Filtro.addEventListener('change', mostrarLista)
 Cancelar.addEventListener('click', fecharEditor)
 Editor.addEventListener('submit', salvarPlaca)
 
