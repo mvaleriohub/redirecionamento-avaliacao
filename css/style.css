@@ -201,6 +201,10 @@ header > button {
     color: var(--secundary);
 }
 
+#exportarCsv {
+    margin-bottom: 16px;
+}
+
 #previaQr {
     display: grid;
     justify-items: center;

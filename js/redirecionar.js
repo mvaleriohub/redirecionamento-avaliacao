@@ -5,7 +5,7 @@ Desenvolvido por Miguel Valério (mvaleriohub)
 
 const urlSupabase = 'https://tzkiyfafjivsujrhzhsb.supabase.co'
 const chavePublica = 'sb_publishable_8pqTFeUWFOYTjGw0HmqT-Q_KbBfgsgY'
-const paginaErro = 'html/404' // sem .html na URL
+const paginaErro = '404' // sem .html na URL; se o GitHub não achar esse endereço, ele mostra a 404.html da raiz do mesmo jeito
 
 async function buscarDestino(codigo) {
   const controle = new AbortController()

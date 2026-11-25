@@ -39,6 +39,7 @@ const BaixarLote = document.getElementById('baixarLote')
 const BaixarQr = document.getElementById('baixarQr')
 const PreviaQr = document.getElementById('previaQr')
 const DestinoQr = document.getElementById('destinoQr')
+const ExportarCsv = document.getElementById('exportarCsv')
 const Filtro = document.getElementById('filtro')
 const NovoLote = document.getElementById('novoLote')
 const FormLote = document.getElementById('formLote')
@@ -490,6 +491,46 @@ async function baixarQrsDaLista() {
   }
 }
 
+// ----- Backup (CSV) -----
+function campoCsv(valor) {
+  let texto = valor == null ? '' : String(valor)
+
+  // texto começando com = + - @ viraria fórmula ao abrir no Excel
+  if (/^[=+\-@]/.test(texto)) texto = `'${texto}`
+
+  return `"${texto.replace(/"/g, '""')}"`
+}
+
+async function exportarPlacas() {
+  // busca de novo no banco (não usa a lista da tela) para o backup sair completo e atual
+  const resposta = await requisicao('/rest/v1/placas?select=*&order=criado_em.asc,codigo.asc')
+
+  if (!resposta) return
+
+  if (!resposta.ok) {
+    avisar('Erro ao exportar as placas.', true)
+    return
+  }
+
+  const dados = await resposta.json()
+  const colunas = ['codigo', 'cliente', 'link_avaliacao', 'ativa', 'data_venda', 'criado_em']
+  const linhas = [colunas.join(';')]
+
+  for (const placa of dados) {
+    linhas.push(colunas.map((coluna) => campoCsv(placa[coluna])).join(';'))
+  }
+
+  // BOM no começo e ponto e vírgula: o Excel em português abre com acentos e colunas certas
+  baixarArquivo(`placas-${hoje()}.csv`, new Blob(['\ufeff' + linhas.join('\r\n')], {type: 'text/csv;charset=utf-8'}))
+
+  if (dados.length >= 1000) {
+    avisar('Atenção: o limite da consulta é 1000 placas, o backup pode estar incompleto.', true)
+    return
+  }
+
+  avisar(`${dados.length} placas exportadas.`)
+}
+
 // ----- Verificação em duas etapas (2FA) -----
 function nivelDaSessao() {
   // o token guarda o nível de acesso: aal1 (só senha) ou aal2 (senha + código do app)
@@ -677,6 +718,7 @@ Cancelar.addEventListener('click', fecharEditor)
 Excluir.addEventListener('click', excluirPlaca)
 BaixarQr.addEventListener('click', baixarQrAtual)
 BaixarLote.addEventListener('click', baixarQrsDaLista)
+ExportarCsv.addEventListener('click', exportarPlacas)
 Editor.addEventListener('submit', salvarPlaca)
 
 // mostra para onde os QRs vão apontar, para conferir antes de imprimir
