@@ -1,0 +1,19 @@
+name: Manter Supabase ativo
+
+on:
+  schedule:
+    - cron: '0 12 */3 * *' # a cada 3 dias, 12:00 UTC (09:00 em Rondônia)
+  workflow_dispatch: # permite rodar na mão pelo botão "Run workflow"
+
+jobs:
+  consultar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Consultar o banco
+        env:
+          URL_SUPABASE: https://tzkiyfafjivsujrhzhsb.supabase.co
+          CHAVE_PUBLICA: sb_publishable_8pqTFeUWFOYTjGw0HmqT-Q_KbBfgsgY
+        run: |
+          curl --fail --silent --show-error --max-time 20 \
+            "$URL_SUPABASE/rest/v1/rpc/obter_destino?p_codigo=ping" \
+            -H "apikey: $CHAVE_PUBLICA"
