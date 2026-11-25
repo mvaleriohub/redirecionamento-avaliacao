@@ -1,12 +1,20 @@
 @charset "UTF-8";
 
-/* Tablet */
-@media screen and (min-width: 768px) {
-    main {max-width: 720px; margin: 0 auto;}
+/* Mobile G */
+@media screen and (min-width: 481px) {
+    main {padding-top: 40px;}
 }
 
-/* Desktop */
-@media screen and (min-width: 1025px) {
-    main {max-width: 860px;}
-    #lista {grid-template-columns: 1fr 1fr;}
+/* Tablet */
+@media screen and (min-width: 768px) {
+    main {max-width: 640px; padding-top: 56px;}
+    #erro > picture {max-width: 420px; padding: 16px;}
+    #erro > h1 {font-size: 32px;}
+    #erro > #placa > #confirmar {width: auto;}
+    #erro > #placa > #resposta > a {width: auto;}
+}
+
+/* Reduzir movimento, se o sistema pedir */
+@media (prefers-reduced-motion: reduce) {
+    button, a.botao {transition: none;}
 }

@@ -1,17 +1,60 @@
 @charset "UTF-8";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap'); /* Fonte */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap'); /* Fonte */
 
+/* Tema claro (padrão) */
 :root {
-    --font-display: 'Inter', sans-serif;
-    --font-color: #1f2933;
-    --font-color-reverse: #ffffff;
-    --background: #f4f6f8;
-    --background2: #ffffff;
-    --primary: #0f766e;
-    --secundary: #64748b;
-    --erro: #b42318;
-    --sucesso: #15803d;
-    --borda: #d5dbe1;
+    --font-display: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+    --azul: #4285F4;
+    --vermelho: #EA4335;
+    --amarelo: #FBBC05;
+    --verde: #34A853;
+
+    --background: #F7F8FA;
+    --background2: #FFFFFF;
+    --background3: #F1F3F4;
+    --borda: #E8EAED;
+    --font-color: #202124;
+    --font-color2: #667085;
+    --font-color-reverse: #FFFFFF;
+
+    --primary: #1A73E8; /* azul mais fechado que o da identidade, para o texto branco ter contraste */
+    --primary-hover: #1765CC;
+    --primary-texto: #FFFFFF;
+    --foco: #4285F4;
+
+    --sucesso: #188038;
+    --atencao: #B06000;
+    --erro: #D93025;
+
+    --palco: transparent; /* fundo atrás do mascote */
+    --sombra: 0 1px 2px rgba(0, 0, 0, 0.06);
+
+    color-scheme: light;
+}
+
+/* Tema escuro */
+:root[data-tema="escuro"] {
+    --background: #18191B;
+    --background2: #202124;
+    --background3: #2A2B2F;
+    --borda: #3C4043;
+    --font-color: #E8EAED;
+    --font-color2: #9AA0A6;
+
+    --primary: #8AB4F8;
+    --primary-hover: #A8C7FA;
+    --primary-texto: #202124;
+
+    --sucesso: #81C995;
+    --atencao: #FDD663;
+    --erro: #F28B82;
+
+    --palco: #E8EAED; /* o contorno do mascote é escuro: precisa de um fundo claro atrás dele */
+    --sombra: 0 1px 2px rgba(0, 0, 0, 0.4);
+
+    color-scheme: dark;
 }
 
 * {
@@ -19,305 +62,158 @@
     padding: 0;
     box-sizing: border-box;
     color: var(--font-color);
-    font-family: var(--font-display);
 }
 
 body {
+    min-height: 100vh;
+    font-family: var(--font-display);
+    font-size: 14px;
+    line-height: 1.5;
     background: var(--background);
 }
 
-/* !important porque os ids de formulário definem display próprio */
+/* Faixa das 4 cores da identidade */
+body::before {
+    content: '';
+    display: block;
+    height: 4px;
+    background: linear-gradient(90deg, var(--azul) 0 25%, var(--vermelho) 25% 50%, var(--amarelo) 50% 75%, var(--verde) 75% 100%);
+}
+
 .oculto {
     display: none !important;
 }
 
-/* Header */
-header {
-    display: flex;
-    justify-content: space-between;
+/* Foco por teclado */
+a:focus-visible,
+button:focus-visible {
+    outline: 2px solid var(--foco);
+    outline-offset: 2px;
+}
+
+/* Botões */
+button,
+a.botao {
+    display: inline-flex;
+    justify-content: center;
     align-items: center;
-    padding: 16px;
-    background: var(--primary);
-}
-
-header > h1 {
-    font-size: 20px;
-    color: var(--font-color-reverse);
-}
-
-header > h1 > span {
-    font-weight: 400;
-    color: var(--font-color-reverse);
-}
-
-main {
-    padding: 16px;
-}
-
-/* Formulários */
-main form {
-    display: grid;
-    gap: 12px;
-    padding: 20px;
-    background: var(--background2);
-    border-radius: 12px;
-}
-
-main label {
+    gap: 8px;
+    padding: 12px 20px;
+    font-family: var(--font-display);
     font-size: 14px;
     font-weight: 600;
-}
-
-main input {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid var(--borda);
-    border-radius: 8px;
-    background: var(--background2);
-}
-
-button {
-    padding: 12px 16px;
-    font-size: 16px;
-    font-weight: 600;
+    text-decoration: none;
     border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    background: var(--primary);
-    color: var(--font-color-reverse);
-}
-
-header > button {
-    background: rgba(0, 0, 0, 0.25);
-}
-
-#cancelar,
-#cancelarLote,
-#gerarCodigo {
-    background: var(--secundary);
-}
-
-#excluir {
-    background: var(--erro);
-}
-
-.textual {
-    justify-self: start;
-    padding: 0;
-    font-size: 14px;
-    font-weight: 400;
-    text-decoration: underline;
-    background: none;
-    color: var(--primary);
-}
-
-.erro {
-    color: var(--erro);
-}
-
-/* Login e verificação em duas etapas */
-#login > form,
-#segundofator > form,
-#configurar > form {
-    margin-top: 40px;
-}
-
-#qrConfigurar {
-    display: grid;
-    justify-items: center;
-}
-
-#qrConfigurar > svg {
-    width: 100%;
-    max-width: 220px;
-    height: auto;
-}
-
-#configurar > form > p > code {
-    font-family: monospace;
-    word-break: break-all;
-}
-
-/* Painel */
-#mensagem {
-    margin-bottom: 12px;
-    font-weight: 600;
-    color: var(--sucesso);
-}
-
-#mensagem.erro {
-    color: var(--erro);
-}
-
-#barra {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-#barra > input {
-    flex: 1;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid var(--borda);
-    border-radius: 8px;
-    background: var(--background2);
-}
-
-#acoes {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-#acoes > button {
-    flex: 1;
-}
-
-#barra > select,
-#barraQr > select {
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid var(--borda);
-    border-radius: 8px;
-    background: var(--background2);
-}
-
-#barraQr {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-#barraQr > button {
-    flex: 1;
-}
-
-#destinoQr {
-    margin-bottom: 16px;
-    font-size: 12px;
-    word-break: break-all;
-    color: var(--secundary);
-}
-
-#exportarCsv {
-    margin-bottom: 16px;
-}
-
-#previaQr {
-    display: grid;
-    justify-items: center;
-}
-
-#previaQr > svg {
-    width: 100%;
-    max-width: 220px;
-    height: auto;
-}
-
-#baixarQr {
-    background: var(--secundary);
-}
-
-#editor,
-#formLote {
-    margin-bottom: 16px;
-}
-
-.linha {
-    display: flex;
-    gap: 8px;
-}
-
-.linha > input {
-    flex: 1;
-}
-
-.linha > button {
-    flex: 1;
-}
-
-.linha > #gerarCodigo {
-    flex: 0 0 auto;
-}
-
-.opcao {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.opcao > input {
-    width: auto;
-}
-
-/* Lista */
-#lista {
-    display: grid;
-    gap: 8px;
-    list-style: none;
-}
-
-#lista > li {
-    display: grid;
-    gap: 2px;
-    padding: 14px;
-    background: var(--background2);
-    border-left: 6px solid var(--borda);
     border-radius: 10px;
     cursor: pointer;
+    background: var(--primary);
+    color: var(--primary-texto);
+    transition: background 0.15s ease;
 }
 
-#lista > li.ativa {
-    border-left-color: var(--sucesso);
+button:hover,
+a.botao:hover {
+    background: var(--primary-hover);
 }
 
-#lista > li.lote {
-    border-left-color: var(--primary);
-}
-
-#lista > li.inativa {
-    border-left-color: var(--secundary);
-}
-
-#lista > li > small {
-    color: var(--secundary);
+a.botao > svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: var(--primary-texto);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 /* Página 404 */
+main {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+}
+
 #erro {
     display: grid;
-    gap: 12px;
-    margin-top: 60px;
+    justify-items: center;
+    gap: 16px;
     text-align: center;
 }
 
-#erro > h2 {
-    font-size: 64px;
-    color: var(--primary);
+#erro > picture {
+    display: block;
+    width: 100%;
+    max-width: 280px;
+    padding: 12px;
+    border-radius: 24px;
+    background: var(--palco);
+}
+
+#erro > picture > img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+#erro > h1 {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+#erro > p {
+    max-width: 420px;
+    color: var(--font-color2);
 }
 
 #erro > #placa {
     display: grid;
+    justify-items: center;
     gap: 12px;
-    margin-top: 24px;
+    width: 100%;
+    margin-top: 8px;
     padding: 20px;
-    background: var(--background2);
+    border: 1px solid var(--borda);
     border-radius: 12px;
+    background: var(--background2);
+    box-shadow: var(--sombra);
+}
+
+#erro > #placa > p {
+    color: var(--font-color2);
+}
+
+#erro > #placa > p.titulo {
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+#erro > #placa > #codigoconsultado {
+    padding: 6px 12px;
+    font-family: var(--font-mono);
+    font-size: 16px;
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    background: var(--background3);
+}
+
+#erro > #placa > #confirmar {
+    width: 100%;
 }
 
 #erro > #placa > #resposta {
     display: grid;
     gap: 12px;
+    width: 100%;
+}
+
+#erro > #placa > #resposta > p {
+    color: var(--font-color2);
 }
 
 #erro > #placa > #resposta > a {
-    padding: 12px 16px;
-    font-size: 16px;
-    font-weight: 600;
-    text-decoration: none;
-    border-radius: 8px;
-    background: var(--sucesso);
-    color: var(--font-color-reverse);
+    width: 100%;
 }
