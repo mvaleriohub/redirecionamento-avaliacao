@@ -5,47 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex">
     <title>Painel de Placas</title>
+    <script src="../js/tema.js"></script>
     <link rel="stylesheet" href="../css/painel-provisorio.css">
     <link rel="stylesheet" href="../css/painel-provisorio-medias.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/medias-queries.css">
     <script src="../js/qrcode.js" defer></script>
     <script src="../js/geradorqr.js" defer></script>
     <script src="../js/painel.js" defer></script>
 </head>
-<body>
+<body class="painel">
     <header>
         <h1>Painel de <span>Placas</span></h1>
         <button id="sair" class="oculto">Sair</button>
     </header>
     <main>
-        <section id="login">
+        <section id="login" class="acesso">
             <form id="formLogin">
-                <label for="email">E-mail</label>
-                <input type="email" id="email" autocomplete="username" required>
-                <label for="senha">Senha</label>
-                <input type="password" id="senha" autocomplete="current-password" required>
+                <div class="cabecalho">
+                    <div class="marca">
+                        <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/><circle cx="20" cy="8" r="5.5"/><circle cx="8" cy="20" r="5.5"/><circle cx="20" cy="20" r="5.5"/></svg>
+                        <span>Painel de Placas</span>
+                    </div>
+                    <h2>Entrar no <span>painel</span></h2>
+                    <p class="subtitulo">Use seu e-mail e senha de administrador.</p>
+                </div>
+                <div class="campo">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" autocomplete="username" required>
+                </div>
+                <div class="campo">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" autocomplete="current-password" required>
+                </div>
                 <button type="submit">Entrar</button>
-                <p id="erroLogin" class="erro"></p>
+                <p id="erroLogin" class="erro" role="alert"></p>
             </form>
         </section>
-        <section id="segundofator" class="oculto">
+        <section id="segundofator" class="acesso oculto">
             <form id="formCodigo">
-                <label for="codigoAcesso">Código do app autenticador</label>
-                <input type="text" id="codigoAcesso" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required>
+                <div class="cabecalho">
+                    <div class="marca">
+                        <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/><circle cx="20" cy="8" r="5.5"/><circle cx="8" cy="20" r="5.5"/><circle cx="20" cy="20" r="5.5"/></svg>
+                        <span>Painel de Placas</span>
+                    </div>
+                    <h2>Verificação em <span>duas etapas</span></h2>
+                    <p class="subtitulo">Digite o código de 6 dígitos que o seu app autenticador mostra.</p>
+                </div>
+                <div class="campo">
+                    <label for="codigoAcesso">Código do app autenticador</label>
+                    <input type="text" id="codigoAcesso" class="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" required>
+                </div>
                 <button type="submit">Confirmar</button>
-                <p id="erroCodigo" class="erro"></p>
+                <p id="erroCodigo" class="erro" role="alert"></p>
             </form>
         </section>
-        <section id="configurar" class="oculto">
+        <section id="configurar" class="acesso oculto">
             <form id="formConfigurar">
-                <h2>Ativar verificação em duas etapas</h2>
-                <p>1. Abra um app autenticador (Google Authenticator, Microsoft Authenticator, Authy...) e escaneie o QR.</p>
+                <div class="cabecalho">
+                    <div class="marca">
+                        <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/><circle cx="20" cy="8" r="5.5"/><circle cx="8" cy="20" r="5.5"/><circle cx="20" cy="20" r="5.5"/></svg>
+                        <span>Painel de Placas</span>
+                    </div>
+                    <h2>Ativar a verificação em <span>duas etapas</span></h2>
+                    <p class="subtitulo">Use um app autenticador (Google Authenticator, Microsoft Authenticator, Authy...).</p>
+                </div>
+                <p class="passo"><span>1</span>Escaneie o QR no app autenticador.</p>
                 <div id="qrConfigurar"></div>
-                <p>Ou digite esta chave no app e <strong>guarde-a no gerenciador de senhas</strong>, para recuperar o acesso se perder o celular:</p>
-                <p><code id="chaveConfigurar"></code></p>
-                <label for="codigoConfigurar">2. Digite o código de 6 dígitos que o app mostra</label>
-                <input type="text" id="codigoConfigurar" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required>
+                <p class="aviso">Ou digite esta chave no app e <strong>guarde-a no gerenciador de senhas</strong>, para recuperar o acesso se perder o celular:</p>
+                <code id="chaveConfigurar"></code>
+                <p class="passo"><span>2</span>Confirme com o código do app.</p>
+                <div class="campo">
+                    <label for="codigoConfigurar">Código de 6 dígitos</label>
+                    <input type="text" id="codigoConfigurar" class="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" required>
+                </div>
                 <button type="submit">Ativar</button>
-                <p id="erroConfigurar" class="erro"></p>
+                <p id="erroConfigurar" class="erro" role="alert"></p>
             </form>
         </section>
         <section id="painel" class="oculto">

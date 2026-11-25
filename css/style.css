@@ -222,3 +222,254 @@ main {
 #erro > #texto > #placa > #resposta > a {
     width: 100%;
 }
+
+/* Painel: acesso (login, 2FA e configuração do 2FA) */
+.acesso {
+    max-width: 400px;
+    margin: 32px auto 0;
+}
+
+.acesso > form {
+    display: grid;
+    gap: 20px;
+    padding: 24px 20px;
+    border: 1px solid var(--borda);
+    border-radius: 14px;
+    background: var(--background2);
+    box-shadow: var(--sombra);
+}
+
+.acesso > form > .cabecalho {
+    display: grid;
+    gap: 8px;
+}
+
+.acesso > form > .cabecalho > .marca {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.acesso > form > .cabecalho > .marca > svg {
+    width: 28px;
+    height: 28px;
+}
+
+.acesso > form > .cabecalho > .marca > svg > circle:nth-child(1) {
+    fill: var(--azul);
+}
+
+.acesso > form > .cabecalho > .marca > svg > circle:nth-child(2) {
+    fill: var(--vermelho);
+}
+
+.acesso > form > .cabecalho > .marca > svg > circle:nth-child(3) {
+    fill: var(--amarelo);
+}
+
+.acesso > form > .cabecalho > .marca > svg > circle:nth-child(4) {
+    fill: var(--verde);
+}
+
+.acesso > form > .cabecalho > .marca > span {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.acesso > form > .cabecalho > h2 {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+}
+
+.acesso > form > .cabecalho > h2 > span {
+    color: var(--primary);
+}
+
+.acesso > form > .cabecalho > .subtitulo {
+    color: var(--font-color2);
+}
+
+/* Campos */
+.acesso > form > .campo {
+    display: grid;
+    gap: 6px;
+}
+
+.acesso > form > .campo > label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--font-color2);
+}
+
+.acesso > form > .campo > input {
+    width: 100%;
+    padding: 10px 12px;
+    font-family: var(--font-display);
+    font-size: 16px;
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    background: var(--background);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.acesso > form > .campo > input::placeholder {
+    color: var(--font-color2);
+    opacity: 0.6;
+}
+
+.acesso > form > .campo > input:focus-visible {
+    outline: none;
+    border-color: var(--foco);
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.25);
+}
+
+/* Código de 6 dígitos */
+.acesso > form > .campo > input.codigo {
+    padding-left: calc(12px + 0.4em); /* compensa o espaço depois do último dígito, para centralizar */
+    font-family: var(--font-mono);
+    font-size: 22px;
+    text-align: center;
+    letter-spacing: 0.4em;
+}
+
+.acesso > form > button[type="submit"] {
+    width: 100%;
+}
+
+/* Erro do formulário (só aparece quando o JS escreve algo) */
+.acesso > form > .erro {
+    padding: 10px 12px;
+    font-size: 13px;
+    border: 1px solid var(--erro);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--erro) 10%, transparent);
+    color: var(--erro);
+}
+
+.acesso > form > .erro:empty {
+    display: none;
+}
+
+/* Configuração do 2FA */
+.acesso > form > .passo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.acesso > form > .passo > span {
+    display: inline-flex;
+    flex: 0 0 auto;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--primary-texto);
+}
+
+.acesso > form > #qrConfigurar {
+    justify-self: center;
+    width: 100%;
+    max-width: 244px;
+    padding: 12px;
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    background: var(--font-color-reverse); /* fundo branco também no tema escuro, para o QR ser lido */
+}
+
+.acesso > form > #qrConfigurar:empty {
+    display: none;
+}
+
+.acesso > form > .aviso {
+    padding: 10px 12px;
+    font-size: 13px;
+    border-left: 3px solid var(--atencao);
+    border-radius: 8px;
+    background: var(--background3);
+    color: var(--font-color2);
+}
+
+.acesso > form > .aviso > strong {
+    color: var(--font-color);
+}
+
+.acesso > form > #chaveConfigurar {
+    display: block;
+    padding: 10px 12px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    text-align: center;
+    word-break: break-all;
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    background: var(--background3);
+    user-select: all;
+}
+
+.acesso > form > #chaveConfigurar:empty {
+    display: none;
+}
+
+/* Header fora do painel: só o botão Sair, sem a barra colorida */
+body.painel:not(:has(#painel:not(.oculto))) > header {
+    justify-content: flex-end;
+    background: none;
+}
+
+body.painel:not(:has(#painel:not(.oculto))) > header > h1 {
+    display: none;
+}
+
+body.painel:not(:has(#painel:not(.oculto))) > header > button {
+    padding: 8px 14px;
+    font-size: 13px;
+    border: 1px solid var(--borda);
+    background: var(--background2);
+    color: var(--font-color);
+}
+
+body.painel:not(:has(#painel:not(.oculto))) > header > button:hover {
+    background: var(--background3);
+}
+
+/* No login nem o header aparece */
+body.painel:has(#login:not(.oculto)) > header {
+    display: none;
+}
+
+/* Painel provisório: ajustes até o painel ser redesenhado (Fases 4 a 7) */
+body.painel > main {
+    display: block;
+    max-width: none;
+    min-height: 0;
+    margin: 0;
+    padding: 16px;
+}
+
+body.painel > header > h1,
+body.painel > header > h1 > span {
+    color: var(--primary-texto);
+}
+
+body.painel > header > button {
+    color: var(--primary-texto);
+}
+
+#login > form,
+#segundofator > form,
+#configurar > form {
+    margin-top: 0; /* o CSS provisório define 40px */
+}
+
+.textual:hover {
+    background: none;
+}

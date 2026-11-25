@@ -3,11 +3,14 @@
 /* Mobile G */
 @media screen and (min-width: 481px) {
     main {padding-top: 40px;}
+    .acesso {margin-top: 48px;}
+    .acesso > form {padding: 32px;}
 }
 
 /* Tablet */
 @media screen and (min-width: 768px) {
     main {max-width: 640px; padding-top: 56px;}
+    .acesso {margin-top: 72px;}
     #erro > picture {max-width: 420px;}
     #erro > #texto > h1 {font-size: 32px;}
     #erro > #texto > #placa > #confirmar {width: auto;}
@@ -26,4 +29,5 @@
 /* Reduzir movimento, se o sistema pedir */
 @media (prefers-reduced-motion: reduce) {
     button, a.botao {transition: none;}
+    .acesso > form > .campo > input {transition: none;}
 }
