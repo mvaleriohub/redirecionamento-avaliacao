@@ -24,6 +24,11 @@ const CampoData = document.getElementById('campoData')
 const GerarCodigo = document.getElementById('gerarCodigo')
 const Cancelar = document.getElementById('cancelar')
 const Excluir = document.getElementById('excluir')
+const FormatoQr = document.getElementById('formatoQr')
+const BaixarLote = document.getElementById('baixarLote')
+const BaixarQr = document.getElementById('baixarQr')
+const PreviaQr = document.getElementById('previaQr')
+const DestinoQr = document.getElementById('destinoQr')
 const Filtro = document.getElementById('filtro')
 const NovoLote = document.getElementById('novoLote')
 const FormLote = document.getElementById('formLote')
@@ -164,16 +169,22 @@ function passaFiltro(placa) {
   return estadoDaPlaca(placa) == estados[Filtro.value]
 }
 
-function mostrarLista() {
+// placas que aparecem na lista agora; o download de QRs em lote usa exatamente esta seleção
+function placasDaLista() {
   const termo = Busca.value.trim().toLowerCase()
+
+  return placas.filter((placa) => {
+    // buscando, o filtro é ignorado: assim achar uma placa em lote ou inativa não depende do filtro
+    if (termo) return `${placa.codigo} ${placa.cliente || ''}`.toLowerCase().includes(termo)
+
+    return passaFiltro(placa)
+  })
+}
+
+function mostrarLista() {
   Lista.replaceChildren()
 
-  for (const placa of placas) {
-    const texto = `${placa.codigo} ${placa.cliente || ''}`.toLowerCase()
-
-    // buscando, o filtro é ignorado: assim achar uma placa em lote ou inativa não depende do filtro
-    if (termo && !texto.includes(termo)) continue
-    if (!termo && !passaFiltro(placa)) continue
+  for (const placa of placasDaLista()) {
 
     const item = document.createElement('li')
     const codigo = document.createElement('strong')
@@ -239,9 +250,16 @@ function abrirEditor(codigo) {
   // data de hoje sempre que não houver uma data guardada (placa nova ou sem data)
   CampoData.value = placa && placa.data_venda ? placa.data_venda : hoje()
   Excluir.classList.toggle('oculto', editando == null) // só placas que já existem podem ser excluídas
+  mostrarPreviaQr(editando)
   FormLote.classList.add('oculto')
   Editor.classList.remove('oculto')
   Editor.scrollIntoView({behavior: 'smooth'})
+}
+
+function mostrarPreviaQr(codigo) {
+  PreviaQr.classList.toggle('oculto', codigo == null)
+  BaixarQr.classList.toggle('oculto', codigo == null)
+  PreviaQr.innerHTML = codigo == null ? '' : criarSvgQr(codigo) // o svg é montado aqui com um código já validado
 }
 
 function fecharEditor() {
@@ -417,6 +435,39 @@ async function excluirPlaca() {
   await carregarPlacas()
 }
 
+// ----- QR code -----
+async function baixarQrAtual() {
+  if (!editando) return
+
+  try {
+    await baixarQr(editando, FormatoQr.value)
+  } catch (erro) {
+    avisar('Erro ao gerar o QR.', true)
+  }
+}
+
+async function baixarQrsDaLista() {
+  const codigos = placasDaLista().map((p) => p.codigo)
+
+  if (!codigos.length) {
+    avisar('Nenhuma placa na lista.', true)
+    return
+  }
+
+  BaixarLote.disabled = true
+  BaixarLote.textContent = 'Gerando...'
+
+  try {
+    await baixarLoteQr(codigos, FormatoQr.value)
+    avisar(`${codigos.length} QRs baixados em um ZIP.`)
+  } catch (erro) {
+    avisar('Erro ao gerar os QRs.', true)
+  } finally {
+    BaixarLote.disabled = false
+    BaixarLote.textContent = 'Baixar QRs da lista (ZIP)'
+  }
+}
+
 // ----- Início -----
 async function iniciarPainel() {
   mostrarTela('painel')
@@ -482,7 +533,12 @@ FormLote.addEventListener('submit', gerarLote)
 Filtro.addEventListener('change', mostrarLista)
 Cancelar.addEventListener('click', fecharEditor)
 Excluir.addEventListener('click', excluirPlaca)
+BaixarQr.addEventListener('click', baixarQrAtual)
+BaixarLote.addEventListener('click', baixarQrsDaLista)
 Editor.addEventListener('submit', salvarPlaca)
+
+// mostra para onde os QRs vão apontar, para conferir antes de imprimir
+DestinoQr.textContent = `Os QRs apontam para: ${urlDaPlaca('codigo')}`
 
 carregarSessao()
 

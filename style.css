@@ -157,12 +157,45 @@ header > button {
     flex: 1;
 }
 
-#barra > select {
+#barra > select,
+#barraQr > select {
     padding: 12px;
     font-size: 16px;
     border: 1px solid var(--borda);
     border-radius: 8px;
     background: var(--background2);
+}
+
+#barraQr {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+#barraQr > button {
+    flex: 1;
+}
+
+#destinoQr {
+    margin-bottom: 16px;
+    font-size: 12px;
+    word-break: break-all;
+    color: var(--secundary);
+}
+
+#previaQr {
+    display: grid;
+    justify-items: center;
+}
+
+#previaQr > svg {
+    width: 100%;
+    max-width: 220px;
+    height: auto;
+}
+
+#baixarQr {
+    background: var(--secundary);
 }
 
 #editor,

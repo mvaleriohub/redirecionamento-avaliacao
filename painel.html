@@ -7,6 +7,8 @@
     <title>Painel de Placas</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="medias-queries.css">
+    <script src="qrcode.js" defer></script>
+    <script src="geradorqr.js" defer></script>
     <script src="painel.js" defer></script>
 </head>
 <body>
@@ -40,6 +42,14 @@
                 <button id="novaPlaca">Cadastrar direto</button>
                 <button id="novoLote">Cadastrar lote inativo</button>
             </div>
+            <div id="barraQr">
+                <select id="formatoQr">
+                    <option value="svg">QR em SVG</option>
+                    <option value="png">QR em PNG</option>
+                </select>
+                <button type="button" id="baixarLote">Baixar QRs da lista (ZIP)</button>
+            </div>
+            <p id="destinoQr"></p>
             <form id="formLote" class="oculto">
                 <label for="campoQuantidade">Quantidade de placas</label>
                 <input type="number" id="campoQuantidade" min="1" max="100" value="10">
@@ -62,6 +72,8 @@
                 <label class="opcao"><input type="checkbox" id="campoAtiva"> Placa ativa</label>
                 <label for="campoData">Data da venda</label>
                 <input type="date" id="campoData">
+                <div id="previaQr" class="oculto"></div>
+                <button type="button" id="baixarQr" class="oculto">Baixar QR desta placa</button>
                 <div class="linha">
                     <button type="submit">Salvar</button>
                     <button type="button" id="cancelar">Cancelar</button>
