@@ -11,8 +11,9 @@ const faixaCodigo = 50 // espaço extra embaixo para o código da placa escrito
 
 // ----- QR -----
 function urlDaPlaca(codigo) {
-  // aponta para a pasta onde o painel está: se o site mudar de endereço, os QRs gerados depois mudam junto
-  return `${new URL('./', location.href).href}?c=${codigo}`
+  // o painel fica em /html/, então sobe uma pasta para chegar na raiz, onde está o index.html do redirecionamento
+  // (se o site mudar de endereço, os QRs gerados depois mudam junto)
+  return `${new URL('../', location.href).href}?c=${codigo}`
 }
 
 function criarSvgQr(codigo) {
