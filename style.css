@@ -116,9 +116,27 @@ header > button {
     color: var(--erro);
 }
 
-/* Login */
-#login > form {
+/* Login e verificação em duas etapas */
+#login > form,
+#segundofator > form,
+#configurar > form {
     margin-top: 40px;
+}
+
+#qrConfigurar {
+    display: grid;
+    justify-items: center;
+}
+
+#qrConfigurar > svg {
+    width: 100%;
+    max-width: 220px;
+    height: auto;
+}
+
+#configurar > form > p > code {
+    font-family: monospace;
+    word-break: break-all;
 }
 
 /* Painel */

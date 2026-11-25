@@ -11,6 +11,16 @@ const TelaPainel = document.getElementById('painel')
 const FormLogin = document.getElementById('formLogin')
 const ErroLogin = document.getElementById('erroLogin')
 const Sair = document.getElementById('sair')
+const TelaSegundoFator = document.getElementById('segundofator')
+const TelaConfigurar = document.getElementById('configurar')
+const FormCodigo = document.getElementById('formCodigo')
+const FormConfigurar = document.getElementById('formConfigurar')
+const CodigoAcesso = document.getElementById('codigoAcesso')
+const CodigoConfigurar = document.getElementById('codigoConfigurar')
+const ErroCodigo = document.getElementById('erroCodigo')
+const ErroConfigurar = document.getElementById('erroConfigurar')
+const QrConfigurar = document.getElementById('qrConfigurar')
+const ChaveConfigurar = document.getElementById('chaveConfigurar')
 const Mensagem = document.getElementById('mensagem')
 const Busca = document.getElementById('busca')
 const NovaPlaca = document.getElementById('novaPlaca')
@@ -45,6 +55,7 @@ let sessao = null
 let placas = []
 let editando = null // código da placa aberta no editor; null quando é uma placa nova
 let modoLink = 'placeid' // 'placeid' (padrão) ou 'completo' (link digitado inteiro)
+let fatorId = null // id do fator do app autenticador (2FA) usado no login atual
 
 // ----- Sessão -----
 function guardarSessao(dados) {
@@ -124,8 +135,10 @@ async function requisicao(caminho, opcoes = {}) {
 // ----- Telas e avisos -----
 function mostrarTela(tela) {
   TelaLogin.classList.toggle('oculto', tela != 'login')
+  TelaSegundoFator.classList.toggle('oculto', tela != 'segundofator')
+  TelaConfigurar.classList.toggle('oculto', tela != 'configurar')
   TelaPainel.classList.toggle('oculto', tela != 'painel')
-  Sair.classList.toggle('oculto', tela != 'painel')
+  Sair.classList.toggle('oculto', tela == 'login')
 }
 
 function avisar(texto, erro = false) {
@@ -477,8 +490,126 @@ async function baixarQrsDaLista() {
   }
 }
 
+// ----- Verificação em duas etapas (2FA) -----
+function nivelDaSessao() {
+  // o token guarda o nível de acesso: aal1 (só senha) ou aal2 (senha + código do app)
+  try {
+    const carga = sessao.token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    return JSON.parse(atob(carga)).aal
+  } catch (erro) {
+    return null
+  }
+}
+
+async function etapaDeAcesso() {
+  if (nivelDaSessao() == 'aal2') return 'painel'
+
+  const resposta = await requisicao('/auth/v1/user')
+  if (!resposta || !resposta.ok) return null
+
+  const usuario = await resposta.json()
+  const fatores = usuario.factors || []
+  const verificado = fatores.find((f) => f.factor_type == 'totp' && f.status == 'verified')
+
+  if (verificado) {
+    fatorId = verificado.id
+    return 'codigo'
+  }
+
+  // apaga tentativas de configuração abandonadas antes de começar uma nova
+  for (const fator of fatores) {
+    await requisicao(`/auth/v1/factors/${fator.id}`, {method: 'DELETE'})
+  }
+
+  return 'configurar'
+}
+
+async function iniciarConfiguracao() {
+  ErroConfigurar.textContent = ''
+  QrConfigurar.innerHTML = ''
+  ChaveConfigurar.textContent = ''
+
+  const resposta = await requisicao('/auth/v1/factors', {
+    method: 'POST',
+    body: JSON.stringify({factor_type: 'totp', friendly_name: `painel-${Date.now()}`, issuer: 'Painel de Placas'})
+  })
+
+  if (!resposta) return
+
+  if (!resposta.ok) {
+    ErroConfigurar.textContent = 'Não foi possível iniciar a configuração. Tente sair e entrar de novo.'
+    return
+  }
+
+  const dados = await resposta.json()
+  fatorId = dados.id
+
+  try {
+    QrConfigurar.innerHTML = criarSvgDoTexto(dados.totp.uri)
+  } catch (erro) {
+    ErroConfigurar.textContent = 'Não foi possível desenhar o QR. Digite a chave abaixo no app.'
+  }
+
+  ChaveConfigurar.textContent = dados.totp.secret
+}
+
+async function confirmarCodigo(codigo) {
+  const desafio = await requisicao(`/auth/v1/factors/${fatorId}/challenge`, {method: 'POST', body: '{}'})
+  if (!desafio || !desafio.ok) return false
+
+  const {id} = await desafio.json()
+  const resposta = await requisicao(`/auth/v1/factors/${fatorId}/verify`, {
+    method: 'POST',
+    body: JSON.stringify({challenge_id: id, code: codigo})
+  })
+
+  if (!resposta || !resposta.ok) return false
+
+  guardarSessao(await resposta.json()) // a sessão nova já vem com nível aal2
+  return true
+}
+
+async function enviarCodigo(evento, campo, erro) {
+  evento.preventDefault()
+  erro.textContent = ''
+
+  try {
+    const confirmou = await confirmarCodigo(campo.value.trim())
+
+    if (!confirmou) {
+      erro.textContent = 'Código incorreto ou expirado. Tente o próximo código do app.'
+      return
+    }
+
+    campo.value = ''
+    await iniciarPainel()
+  } catch (falha) {
+    erro.textContent = 'Sem conexão. Tente de novo.'
+  }
+}
+
 // ----- Início -----
 async function iniciarPainel() {
+  const etapa = await etapaDeAcesso()
+
+  if (!sessao) return // a sessão pode ter sido encerrada durante a verificação
+
+  if (etapa == 'codigo') {
+    mostrarTela('segundofator')
+    return
+  }
+
+  if (etapa == 'configurar') {
+    mostrarTela('configurar')
+    await iniciarConfiguracao()
+    return
+  }
+
+  if (etapa != 'painel') {
+    encerrarSessao()
+    return
+  }
+
   mostrarTela('painel')
   await carregarPlacas()
 
@@ -532,6 +663,8 @@ CampoLink.addEventListener('input', () => {
   }
 })
 
+FormCodigo.addEventListener('submit', (evento) => enviarCodigo(evento, CodigoAcesso, ErroCodigo))
+FormConfigurar.addEventListener('submit', (evento) => enviarCodigo(evento, CodigoConfigurar, ErroConfigurar))
 Sair.addEventListener('click', encerrarSessao)
 Busca.addEventListener('input', mostrarLista)
 NovaPlaca.addEventListener('click', () => abrirEditor(''))

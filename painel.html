@@ -27,6 +27,27 @@
                 <p id="erroLogin" class="erro"></p>
             </form>
         </section>
+        <section id="segundofator" class="oculto">
+            <form id="formCodigo">
+                <label for="codigoAcesso">Código do app autenticador</label>
+                <input type="text" id="codigoAcesso" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required>
+                <button type="submit">Confirmar</button>
+                <p id="erroCodigo" class="erro"></p>
+            </form>
+        </section>
+        <section id="configurar" class="oculto">
+            <form id="formConfigurar">
+                <h2>Ativar verificação em duas etapas</h2>
+                <p>1. Abra um app autenticador (Google Authenticator, Microsoft Authenticator, Authy...) e escaneie o QR.</p>
+                <div id="qrConfigurar"></div>
+                <p>Ou digite esta chave no app e <strong>guarde-a no gerenciador de senhas</strong>, para recuperar o acesso se perder o celular:</p>
+                <p><code id="chaveConfigurar"></code></p>
+                <label for="codigoConfigurar">2. Digite o código de 6 dígitos que o app mostra</label>
+                <input type="text" id="codigoConfigurar" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required>
+                <button type="submit">Ativar</button>
+                <p id="erroConfigurar" class="erro"></p>
+            </form>
+        </section>
         <section id="painel" class="oculto">
             <p id="mensagem"></p>
             <div id="barra">

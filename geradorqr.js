@@ -16,17 +16,26 @@ function urlDaPlaca(codigo) {
 }
 
 function criarSvgQr(codigo) {
+  return desenharQr(urlDaPlaca(codigo), codigo)
+}
+
+// QR de um texto qualquer, sem código escrito embaixo (usado no 2FA do painel)
+function criarSvgDoTexto(texto) {
+  return desenharQr(texto, '')
+}
+
+function desenharQr(texto, rotulo) {
   if (typeof qrcode == 'undefined') {
     throw new Error('o arquivo qrcode.js não carregou; confira se ele está no repositório')
   }
 
   const qr = qrcode(0, 'Q') // correção de erro Q: aguenta placa riscada ou gasta
-  qr.addData(urlDaPlaca(codigo))
+  qr.addData(texto)
   qr.make()
 
   const modulos = qr.getModuleCount()
   const lado = (modulos + margemModulos * 2) * tamanhoModulo
-  const altura = lado + faixaCodigo
+  const altura = lado + (rotulo ? faixaCodigo : 0)
   let quadrados = ''
 
   for (let linha = 0; linha < modulos; linha++) {
@@ -43,7 +52,7 @@ function criarSvgQr(codigo) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${lado} ${altura}" width="${lado}" height="${altura}">` +
     `<rect width="${lado}" height="${altura}" fill="#fff"/>` +
     `<path d="${quadrados}" fill="#000" shape-rendering="crispEdges"/>` +
-    `<text x="${lado / 2}" y="${lado + 32}" text-anchor="middle" font-family="monospace" font-size="30" font-weight="bold" fill="#000">${codigo}</text>` +
+    (rotulo ? `<text x="${lado / 2}" y="${lado + 32}" text-anchor="middle" font-family="monospace" font-size="30" font-weight="bold" fill="#000">${rotulo}</text>` : '') +
     `</svg>`
 }
 
