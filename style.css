@@ -98,6 +98,10 @@ header > button {
     background: var(--secundary);
 }
 
+#excluir {
+    background: var(--erro);
+}
+
 .textual {
     justify-self: start;
     padding: 0;

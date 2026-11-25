@@ -23,6 +23,7 @@ const CampoAtiva = document.getElementById('campoAtiva')
 const CampoData = document.getElementById('campoData')
 const GerarCodigo = document.getElementById('gerarCodigo')
 const Cancelar = document.getElementById('cancelar')
+const Excluir = document.getElementById('excluir')
 const Filtro = document.getElementById('filtro')
 const NovoLote = document.getElementById('novoLote')
 const FormLote = document.getElementById('formLote')
@@ -237,6 +238,7 @@ function abrirEditor(codigo) {
   CampoAtiva.checked = placa ? placa.ativa || estadoDaPlaca(placa) == 'lote' : false
   // data de hoje sempre que não houver uma data guardada (placa nova ou sem data)
   CampoData.value = placa && placa.data_venda ? placa.data_venda : hoje()
+  Excluir.classList.toggle('oculto', editando == null) // só placas que já existem podem ser excluídas
   FormLote.classList.add('oculto')
   Editor.classList.remove('oculto')
   Editor.scrollIntoView({behavior: 'smooth'})
@@ -387,6 +389,34 @@ async function salvarPlaca(evento) {
   await carregarPlacas()
 }
 
+async function excluirPlaca() {
+  if (!editando) return
+
+  const codigo = editando
+  const placa = placas.find((p) => p.codigo == codigo)
+  const aviso = placa && placa.ativa
+    ? `A placa ${codigo} está ATIVA e vai parar de funcionar. Excluir mesmo? Não dá para desfazer.`
+    : `Excluir a placa ${codigo}? Não dá para desfazer.`
+
+  if (!confirm(aviso)) return
+
+  const resposta = await requisicao(`/rest/v1/placas?codigo=eq.${codigo}`, {
+    method: 'DELETE',
+    headers: {'Prefer': 'return=minimal'}
+  })
+
+  if (!resposta) return
+
+  if (!resposta.ok) {
+    avisar('Erro ao excluir. Tente de novo.', true)
+    return
+  }
+
+  avisar(`Placa ${codigo} excluída.`)
+  fecharEditor()
+  await carregarPlacas()
+}
+
 // ----- Início -----
 async function iniciarPainel() {
   mostrarTela('painel')
@@ -394,7 +424,7 @@ async function iniciarPainel() {
 
   if (!sessao) return
 
-  // painel.html?c=k7x2 já abre a placa k7x2 (ou o cadastro dela, se ainda não existir)
+  // painel?c=k7x2 já abre a placa k7x2 (ou o cadastro dela, se ainda não existir)
   const codigoUrl = new URLSearchParams(location.search).get('c')
   if (codigoUrl) abrirEditor(codigoUrl.toLowerCase())
 }
@@ -451,6 +481,7 @@ CancelarLote.addEventListener('click', () => FormLote.classList.add('oculto'))
 FormLote.addEventListener('submit', gerarLote)
 Filtro.addEventListener('change', mostrarLista)
 Cancelar.addEventListener('click', fecharEditor)
+Excluir.addEventListener('click', excluirPlaca)
 Editor.addEventListener('submit', salvarPlaca)
 
 carregarSessao()
