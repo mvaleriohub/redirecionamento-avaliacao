@@ -24,9 +24,16 @@ const CampoData = document.getElementById('campoData')
 const GerarCodigo = document.getElementById('gerarCodigo')
 const Cancelar = document.getElementById('cancelar')
 
+const RotuloLink = document.getElementById('rotuloLink')
+const TrocarModo = document.getElementById('trocarModo')
+
+const prefixoAvaliacao = 'https://search.google.com/local/writereview?placeid='
+const padraoAvaliacao = /^https:\/\/search\.google\.com\/local\/writereview\?placeid=([A-Za-z0-9_-]+)$/
+
 let sessao = null
 let placas = []
 let editando = null // código da placa aberta no editor; null quando é uma placa nova
+let modoLink = 'placeid' // 'placeid' (padrão) ou 'completo' (link digitado inteiro)
 
 // ----- Sessão -----
 function guardarSessao(dados) {
@@ -167,17 +174,46 @@ function mostrarLista() {
 }
 
 // ----- Editor -----
+function definirModo(modo) {
+  modoLink = modo
+
+  if (modo == 'placeid') {
+    RotuloLink.textContent = 'Place ID'
+    CampoLink.placeholder = 'Cole o Place ID (ChIJ...)'
+    TrocarModo.textContent = 'Usar o link completo'
+  } else {
+    RotuloLink.textContent = 'Link de avaliação'
+    CampoLink.placeholder = 'https://...'
+    TrocarModo.textContent = 'Usar só o Place ID'
+  }
+}
+
 function abrirEditor(codigo) {
   const placa = placas.find((p) => p.codigo == codigo)
+  const link = placa ? placa.link_avaliacao || '' : ''
+  const achado = link.match(padraoAvaliacao)
 
   editando = placa ? placa.codigo : null
   CampoCodigo.value = codigo
   CampoCodigo.disabled = editando != null // o código não muda depois de criado
   GerarCodigo.classList.toggle('oculto', editando != null)
   CampoCliente.value = placa ? placa.cliente || '' : ''
-  CampoLink.value = placa ? placa.link_avaliacao || '' : ''
+
+  // link no formato padrão mostra só o Place ID; qualquer outro link abre no modo completo
+  if (achado) {
+    definirModo('placeid')
+    CampoLink.value = achado[1]
+  } else if (link) {
+    definirModo('completo')
+    CampoLink.value = link
+  } else {
+    definirModo('placeid')
+    CampoLink.value = ''
+  }
+
   CampoAtiva.checked = placa ? placa.ativa : false
-  CampoData.value = placa ? placa.data_venda || '' : ''
+  // data de hoje sempre que não houver uma data guardada (placa nova ou sem data)
+  CampoData.value = placa && placa.data_venda ? placa.data_venda : hoje()
   Editor.classList.remove('oculto')
   Editor.scrollIntoView({behavior: 'smooth'})
 }
@@ -205,7 +241,7 @@ async function salvarPlaca(evento) {
   evento.preventDefault()
 
   const codigo = CampoCodigo.value.trim().toLowerCase()
-  const link = CampoLink.value.trim()
+  const valorLink = CampoLink.value.trim()
   const ativa = CampoAtiva.checked
 
   if (!/^[a-z0-9]{3,12}$/.test(codigo)) {
@@ -213,15 +249,23 @@ async function salvarPlaca(evento) {
     return
   }
 
-  if (link && !link.startsWith('https://')) {
+  if (valorLink && modoLink == 'placeid' && !/^[A-Za-z0-9_-]{20,}$/.test(valorLink)) {
+    avisar('Place ID inválido. Confira se copiou inteiro, sem espaços.', true)
+    return
+  }
+
+  if (valorLink && modoLink == 'completo' && !valorLink.startsWith('https://')) {
     avisar('O link precisa começar com https://', true)
     return
   }
 
-  if (ativa && !link) {
-    avisar('Para ativar, cole o link de avaliação.', true)
+  if (ativa && !valorLink) {
+    avisar('Para ativar, cole o Place ID (ou o link de avaliação).', true)
     return
   }
+
+  // no modo padrão o link é montado a partir do Place ID
+  const link = !valorLink ? '' : modoLink == 'placeid' ? prefixoAvaliacao + valorLink : valorLink
 
   const dados = {
     cliente: CampoCliente.value.trim() || null,
@@ -294,6 +338,27 @@ FormLogin.addEventListener('submit', async (evento) => {
     await iniciarPainel()
   } catch (erro) {
     ErroLogin.textContent = 'Sem conexão. Tente de novo.'
+  }
+})
+
+TrocarModo.addEventListener('click', () => {
+  definirModo(modoLink == 'placeid' ? 'completo' : 'placeid')
+  CampoLink.value = ''
+  CampoLink.focus()
+})
+
+CampoLink.addEventListener('input', () => {
+  const valor = CampoLink.value.trim()
+
+  if (modoLink != 'placeid' || !valor.startsWith('https://')) return
+
+  // colou um link no campo do Place ID: extrai o ID se for o formato padrão, senão troca para o modo completo
+  const achado = valor.match(padraoAvaliacao)
+
+  if (achado) {
+    CampoLink.value = achado[1]
+  } else {
+    definirModo('completo')
   }
 })
 
