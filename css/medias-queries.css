@@ -32,7 +32,7 @@
 
 /* Desktop: texto de um lado e mascote do outro */
 @media screen and (min-width: 900px) {
-    main {display: grid; align-items: center; max-width: 1040px; min-height: calc(100vh - 4px); padding-top: 24px;}
+    main {display: grid; align-items: center; max-width: 1040px; min-height: 100vh; padding-top: 24px;}
     #erro {grid-template-columns: 1fr 1fr; align-items: center; gap: 48px; text-align: left;}
     #erro > picture {order: 2; max-width: 480px; justify-self: center;}
     #erro > #texto {justify-items: start; align-content: center;}
@@ -41,7 +41,7 @@
 
 /* Desktop: menu lateral fixo */
 @media screen and (min-width: 900px) {
-    #painel {display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 4px);}
+    #painel {display: grid; grid-template-columns: 240px 1fr; min-height: 100vh;}
     #painel > #menu {position: sticky; z-index: auto; align-self: start; width: auto; height: 100vh; visibility: visible; transform: none; transition: none;}
     #painel > #fundomenu {display: none !important;}
     #painel > #conteudo > #topo {padding: 14px 32px;}

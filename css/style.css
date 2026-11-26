@@ -16,7 +16,7 @@
     --background3: #F1F3F4;
     --borda: #E8EAED;
     --font-color: #202124;
-    --font-color2: #667085;
+    --font-color2: #5F6572;
     --font-color-reverse: #FFFFFF;
 
     --primary: #1A73E8; /* azul mais fechado que o da identidade, para o texto branco ter contraste */
@@ -29,7 +29,6 @@
     --erro: #D93025;
 
     --sombra: 0 1px 2px rgba(0, 0, 0, 0.06);
-    --halo: none; /* contorno claro em volta do mascote, só no tema escuro */
 
     color-scheme: light;
 }
@@ -52,7 +51,6 @@
     --erro: #F28B82;
 
     --sombra: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --halo: drop-shadow(0 0 1px #E8EAED) drop-shadow(0 0 2px rgba(232, 234, 237, 0.7));
 
     color-scheme: dark;
 }
@@ -73,14 +71,6 @@ body {
     background: var(--background);
 }
 
-/* Faixa das 4 cores da identidade */
-body::before {
-    content: '';
-    display: block;
-    height: 4px;
-    background: linear-gradient(90deg, var(--azul) 0 25%, var(--vermelho) 25% 50%, var(--amarelo) 50% 75%, var(--verde) 75% 100%);
-}
-
 .oculto {
     display: none !important;
 }
@@ -88,6 +78,13 @@ body::before {
 /* Foco por teclado */
 a:focus-visible,
 button:focus-visible {
+    outline: 2px solid var(--foco);
+    outline-offset: 2px;
+}
+
+#lista > li:focus-visible,
+#recentes > li:focus-visible,
+.opcao > input:focus-visible {
     outline: 2px solid var(--foco);
     outline-offset: 2px;
 }
@@ -151,7 +148,6 @@ main {
     display: block;
     width: 100%;
     height: auto;
-    filter: var(--halo);
 }
 
 #erro > #texto {
@@ -320,7 +316,7 @@ main {
 
 .campo input::placeholder {
     color: var(--font-color2);
-    opacity: 0.6;
+    opacity: 0.8;
 }
 
 .campo input:focus-visible {
@@ -963,36 +959,6 @@ h2#tituloEditor,
 #filtros > button > span {
     color: inherit;
     opacity: 0.7;
-}
-
-#maisacoes {
-    margin-bottom: 16px;
-}
-
-#maisacoes > summary {
-    width: fit-content;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    color: var(--font-color2);
-}
-
-#maisacoes > div {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 12px;
-}
-
-#maisacoes > div > button {
-    font-size: 13px;
-}
-
-#maisacoes > div > #destinoQr {
-    flex-basis: 100%;
-    font-size: 12px;
-    word-break: break-all;
-    color: var(--font-color2);
 }
 
 /* Lista: cartões no celular, tabela a partir de 768px (medias-queries.css) */

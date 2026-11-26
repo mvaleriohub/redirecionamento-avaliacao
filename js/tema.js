@@ -4,6 +4,7 @@ Desenvolvido por Miguel Valério (mvaleriohub)
 */
 
 // Carregado no <head>, antes da página aparecer: o tema certo já está aplicado quando o navegador pinta a tela (sem piscar)
+// O padrão é sempre o claro, em qualquer aparelho. O escuro só vale depois que o admin escolhe pelo painel (alternarTema), e fica salvo naquele aparelho
 
 function temaSalvo() {
   try {
@@ -29,5 +30,4 @@ function alternarTema() {
   }
 }
 
-// primeira visita: segue o tema do sistema
-aplicarTema(temaSalvo() || (matchMedia('(prefers-color-scheme: dark)').matches ? 'escuro' : 'claro'))
+aplicarTema(temaSalvo() == 'escuro' ? 'escuro' : 'claro')

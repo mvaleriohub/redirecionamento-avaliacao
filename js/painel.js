@@ -284,6 +284,21 @@ function atualizarContagens() {
   }
 }
 
+// linha clicável que também abre com Enter ou espaço, para quem usa o teclado
+function tornarClicavel(item, acao) {
+  item.tabIndex = 0
+  item.addEventListener('click', acao)
+  item.addEventListener('keydown', (evento) => {
+    // só quando o foco está na própria linha, não nos botões dentro dela
+    if (evento.target != item) return
+
+    if (evento.key == 'Enter' || evento.key == ' ') {
+      evento.preventDefault()
+      acao()
+    }
+  })
+}
+
 function criarLinha(placa) {
   const estado = estadoDaPlaca(placa)
   const item = document.createElement('li')
@@ -325,7 +340,7 @@ function criarLinha(placa) {
   acoes.appendChild(botao)
 
   item.append(codigo, cliente, status, venda, cadastro, acoes)
-  item.addEventListener('click', () => abrirEditor(placa.codigo))
+  tornarClicavel(item, () => abrirEditor(placa.codigo))
   return item
 }
 
@@ -375,7 +390,7 @@ function mostrarDashboard() {
     cliente.textContent = placa.cliente || 'Sem cliente'
     venda.textContent = formatarData(placa.data_venda)
     item.append(codigo, cliente, venda)
-    item.addEventListener('click', () => abrirEditor(placa.codigo))
+    tornarClicavel(item, () => abrirEditor(placa.codigo))
     Recentes.appendChild(item)
   }
 
