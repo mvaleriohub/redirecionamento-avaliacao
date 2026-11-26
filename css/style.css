@@ -62,6 +62,7 @@
     padding: 0;
     box-sizing: border-box;
     color: var(--font-color);
+    font-family: var(--font-display);
 }
 
 body {
@@ -295,18 +296,18 @@ main {
 }
 
 /* Campos */
-.acesso > form > .campo {
+.campo {
     display: grid;
     gap: 6px;
 }
 
-.acesso > form > .campo > label {
+.campo > label {
     font-size: 13px;
     font-weight: 500;
     color: var(--font-color2);
 }
 
-.acesso > form > .campo > input {
+.campo input {
     width: 100%;
     padding: 10px 12px;
     font-family: var(--font-display);
@@ -317,19 +318,19 @@ main {
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.acesso > form > .campo > input::placeholder {
+.campo input::placeholder {
     color: var(--font-color2);
     opacity: 0.6;
 }
 
-.acesso > form > .campo > input:focus-visible {
+.campo input:focus-visible {
     outline: none;
     border-color: var(--foco);
     box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.25);
 }
 
 /* Código de 6 dígitos */
-.acesso > form > .campo > input.codigo {
+.campo input.codigo {
     padding-left: calc(12px + 0.4em); /* compensa o espaço depois do último dígito, para centralizar */
     font-family: var(--font-mono);
     font-size: 22px;
@@ -387,6 +388,12 @@ main {
     background: var(--font-color-reverse); /* fundo branco também no tema escuro, para o QR ser lido */
 }
 
+.acesso > form > #qrConfigurar > svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
 .acesso > form > #qrConfigurar:empty {
     display: none;
 }
@@ -421,17 +428,19 @@ main {
     display: none;
 }
 
-/* Header fora do painel: só o botão Sair, sem a barra colorida */
-body.painel:not(:has(#painel:not(.oculto))) > header {
+/* Header global: só aparece nas telas de 2FA, com o botão Sair */
+body.painel > header {
+    display: flex;
     justify-content: flex-end;
-    background: none;
+    align-items: center;
+    padding: 16px;
 }
 
-body.painel:not(:has(#painel:not(.oculto))) > header > h1 {
+body.painel > header > h1 {
     display: none;
 }
 
-body.painel:not(:has(#painel:not(.oculto))) > header > button {
+body.painel > header > button {
     padding: 8px 14px;
     font-size: 13px;
     border: 1px solid var(--borda);
@@ -439,41 +448,21 @@ body.painel:not(:has(#painel:not(.oculto))) > header > button {
     color: var(--font-color);
 }
 
-body.painel:not(:has(#painel:not(.oculto))) > header > button:hover {
+body.painel > header > button:hover {
     background: var(--background3);
 }
 
-/* No login nem o header aparece */
 body.painel:has(#login:not(.oculto)) > header {
     display: none;
 }
 
-/* Painel provisório: ajustes até o painel ser redesenhado (Fases 4 a 7) */
+/* Telas de acesso */
 body.painel > main {
     display: block;
     max-width: none;
     min-height: 0;
     margin: 0;
     padding: 16px;
-}
-
-body.painel > header > h1,
-body.painel > header > h1 > span {
-    color: var(--primary-texto);
-}
-
-body.painel > header > button {
-    color: var(--primary-texto);
-}
-
-#login > form,
-#segundofator > form,
-#configurar > form {
-    margin-top: 0; /* o CSS provisório define 40px */
-}
-
-.textual:hover {
-    background: none;
 }
 
 /* Painel: estrutura (menu lateral, topo e vistas) */
@@ -710,4 +699,446 @@ button.icone > svg,
 
 .vista > .vazio > p > a {
     color: var(--primary);
+}
+
+/* Componentes gerais */
+select {
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    background: var(--background2);
+}
+
+select:focus-visible {
+    outline: 2px solid var(--foco);
+    outline-offset: 1px;
+}
+
+button.secundario {
+    border: 1px solid var(--borda);
+    background: var(--background2);
+    color: var(--font-color);
+}
+
+button.secundario:hover {
+    background: var(--background3);
+}
+
+button.perigo {
+    border: 1px solid var(--erro);
+    background: none;
+    color: var(--erro);
+}
+
+button.perigo:hover {
+    background: color-mix(in srgb, var(--erro) 10%, transparent);
+}
+
+.textual {
+    justify-self: start;
+    padding: 0;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: underline;
+    background: none;
+    color: var(--primary);
+}
+
+.textual:hover {
+    background: none;
+    color: var(--primary-hover);
+}
+
+.erro {
+    color: var(--erro);
+}
+
+.subtitulo {
+    color: var(--font-color2);
+}
+
+.linha {
+    display: flex;
+    gap: 8px;
+}
+
+.linha > input {
+    flex: 1;
+    min-width: 0;
+}
+
+.linha > button {
+    flex: 0 0 auto;
+}
+
+.opcao {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.opcao > input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+}
+
+/* Avisos: na página (#mensagem) e dentro dos modais (.avisomodal) */
+#mensagem,
+.avisomodal {
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--sucesso);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--sucesso) 10%, transparent);
+    color: var(--sucesso);
+}
+
+#mensagem {
+    margin-bottom: 12px;
+}
+
+#mensagem.erro,
+.avisomodal.erro {
+    border-color: var(--erro);
+    background: color-mix(in srgb, var(--erro) 10%, transparent);
+    color: var(--erro);
+}
+
+#mensagem:empty,
+.avisomodal:empty {
+    display: none;
+}
+
+/* Modais */
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.45);
+}
+
+#gaveta {
+    position: fixed;
+    inset: 0 0 0 auto;
+    width: min(440px, 100%);
+    max-width: 100%;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    border: none;
+    border-left: 1px solid var(--borda);
+    background: var(--background2);
+    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
+}
+
+@keyframes entrar-gaveta {
+    from {transform: translateX(24px); opacity: 0;}
+    to {transform: none; opacity: 1;}
+}
+
+#gaveta[open] {
+    animation: entrar-gaveta 0.2s ease;
+}
+
+#gaveta > form {
+    display: grid;
+    align-content: start;
+    gap: 16px;
+    min-height: 100%;
+    padding: 20px;
+}
+
+#gaveta > form > .topogaveta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+h2#tituloEditor,
+#tituloLote {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.rodape {
+    display: flex;
+    gap: 8px;
+}
+
+.rodape > button[type="submit"] {
+    flex: 1;
+}
+
+#previaQr {
+    justify-self: center;
+    width: 100%;
+    max-width: 200px;
+    padding: 10px;
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    background: var(--font-color-reverse); /* fundo branco também no tema escuro, para o QR ser lido */
+}
+
+#previaQr > svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+#dialogolote {
+    width: min(380px, calc(100% - 32px));
+    margin: auto;
+    padding: 0;
+    border: 1px solid var(--borda);
+    border-radius: 16px;
+    background: var(--background2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+#dialogolote > form {
+    display: grid;
+    gap: 16px;
+    padding: 24px;
+}
+
+#dialogolote > form > .cabecalho {
+    display: grid;
+    gap: 4px;
+}
+
+/* Vista Placas: busca, filtros e mais ações */
+#barraplacas {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+#barraplacas > input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    font-size: 16px;
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    background: var(--background2);
+}
+
+#barraplacas > input:focus-visible {
+    outline: none;
+    border-color: var(--foco);
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.25);
+}
+
+#filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+#filtros > button {
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--borda);
+    border-radius: 999px;
+    background: var(--background2);
+    color: var(--font-color2);
+}
+
+#filtros > button:hover {
+    background: var(--background3);
+}
+
+#filtros > button[aria-pressed="true"] {
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    color: var(--primary);
+}
+
+#filtros > button > span {
+    color: inherit;
+    opacity: 0.7;
+}
+
+#maisacoes {
+    margin-bottom: 16px;
+}
+
+#maisacoes > summary {
+    width: fit-content;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--font-color2);
+}
+
+#maisacoes > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+#maisacoes > div > button {
+    font-size: 13px;
+}
+
+#maisacoes > div > #destinoQr {
+    flex-basis: 100%;
+    font-size: 12px;
+    word-break: break-all;
+    color: var(--font-color2);
+}
+
+/* Lista: cartões no celular, tabela a partir de 768px (medias-queries.css) */
+#tabela > #cabecalholista {
+    display: none;
+}
+
+#lista {
+    display: grid;
+    gap: 8px;
+    list-style: none;
+}
+
+#lista > li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    grid-template-areas: "codigo status acoes" "cliente cliente cliente" "venda cadastro cadastro";
+    align-items: center;
+    gap: 4px 12px;
+    padding: 14px;
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    background: var(--background2);
+    box-shadow: var(--sombra);
+    cursor: pointer;
+}
+
+#lista > li:hover {
+    background: var(--background3);
+}
+
+#lista > li > strong {
+    grid-area: codigo;
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 500;
+}
+
+#lista > li > .cliente {
+    grid-area: cliente;
+}
+
+#lista > li > .semcliente {
+    color: var(--font-color2);
+}
+
+#lista > li > .status {
+    grid-area: status;
+    justify-self: end;
+    padding: 2px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--cor) 14%, transparent);
+    color: var(--cor);
+}
+
+#lista > li > .status.ativa {--cor: var(--sucesso);}
+#lista > li > .status.lote {--cor: var(--primary);}
+#lista > li > .status.inativa {--cor: var(--font-color2);}
+
+#lista > li > .venda,
+#lista > li > .cadastro {
+    font-size: 12px;
+    color: var(--font-color2);
+}
+
+#lista > li > .venda {
+    grid-area: venda;
+}
+
+#lista > li > .cadastro {
+    grid-area: cadastro;
+}
+
+#lista > li > .venda::before,
+#lista > li > .cadastro::before {
+    content: attr(data-rotulo) " ";
+}
+
+#lista > li > .acoes {
+    position: relative;
+    grid-area: acoes;
+}
+
+#lista > li > .acoes > button.icone {
+    width: 32px;
+    height: 32px;
+    border-color: transparent;
+    background: none;
+}
+
+#lista > li > .acoes > button.icone:hover {
+    background: var(--background3);
+}
+
+#lista > li > .acoes > button.icone > svg {
+    stroke-width: 2.5;
+}
+
+#lista > li.vazia {
+    display: block;
+    padding: 32px 16px;
+    text-align: center;
+    cursor: default;
+    color: var(--font-color2);
+}
+
+#lista > li.vazia:hover {
+    background: var(--background2);
+}
+
+/* Menu de ações da linha */
+.menulinha {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    z-index: 15;
+    display: grid;
+    min-width: 160px;
+    padding: 6px;
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    background: var(--background2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.menulinha > button {
+    justify-content: flex-start;
+    padding: 8px 10px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    background: none;
+    color: var(--font-color);
+}
+
+.menulinha > button:hover {
+    background: var(--background3);
+}
+
+.menulinha > button.perigo {
+    color: var(--erro);
+}
+
+.menulinha > button.perigo:hover {
+    background: color-mix(in srgb, var(--erro) 10%, transparent);
 }

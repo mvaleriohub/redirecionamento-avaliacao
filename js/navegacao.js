@@ -3,7 +3,7 @@ Desenvolvido por Miguel Valério (mvaleriohub)
 25/11/2026 -- (11/25/2026)
 */
 
-// Estrutura do painel: vistas por hash, menu lateral no celular, tema e conta.
+// Estrutura do painel: vistas (endereço sempre sem #), menu lateral no celular, tema e conta.
 // Depende de painel.js (usa sessao e encerrarSessao) e de tema.js (alternarTema)
 
 const Menu = document.getElementById('menu')
@@ -31,13 +31,18 @@ const titulos = {
 const vistaInicial = 'placas' // vira 'dashboard' quando o dashboard existir (Fase 6)
 
 // ----- Vistas -----
+let vistaAtual = null
+
 function nomeDoHash() {
+  // só para links antigos com #placas; depois de abrir, o endereço fica sem hash
   const nome = location.hash.slice(1)
 
   return Object.hasOwn(titulos, nome) ? nome : vistaInicial
 }
 
 function mostrarVista(nome) {
+  vistaAtual = nome
+
   for (const vista of Vistas) {
     vista.classList.toggle('oculto', vista.dataset.vista != nome)
   }
@@ -53,6 +58,14 @@ function mostrarVista(nome) {
   TituloVista.textContent = titulos[nome]
   fecharMenu()
   fecharConta()
+}
+
+// troca de vista sem mexer no endereço: o histórico guarda a vista, o link continua só "painel"
+function irParaVista(nome) {
+  if (nome != vistaAtual) history.pushState({vista: nome}, '', location.pathname + location.search)
+
+  mostrarVista(nome)
+  window.scrollTo(0, 0)
 }
 
 // ----- Menu (celular) -----
@@ -109,13 +122,16 @@ SairPainel.addEventListener('click', () => {
   encerrarSessao()
 })
 
-for (const link of LinksMenu) {
-  // clicar na vista que já está aberta não muda o hash, então o menu fecha aqui
-  link.addEventListener('click', fecharMenu)
-}
-
 document.addEventListener('click', (evento) => {
   if (!Conta.contains(evento.target)) fecharConta()
+
+  // qualquer link com data-vista (menu e atalhos) troca de vista sem colocar # no endereço
+  const link = evento.target.closest('a[data-vista]')
+
+  if (link) {
+    evento.preventDefault()
+    irParaVista(link.dataset.vista)
+  }
 })
 
 document.addEventListener('keydown', (evento) => {
@@ -129,10 +145,16 @@ document.addEventListener('keydown', (evento) => {
   fecharConta()
 })
 
-window.addEventListener('hashchange', () => mostrarVista(nomeDoHash()))
+// botão voltar do navegador
+window.addEventListener('popstate', (evento) => {
+  mostrarVista(evento.state && evento.state.vista ? evento.state.vista : vistaInicial)
+})
 
 // ao passar para a tela grande o menu já fica fixo, então o fundo escuro sai
 matchMedia('(min-width: 900px)').addEventListener('change', fecharMenu)
 
 // painel?c=k7x2 abre a placa pelo painel.js, e o editor fica na vista Placas
-mostrarVista(new URLSearchParams(location.search).get('c') ? 'placas' : nomeDoHash())
+const vistaDeEntrada = new URLSearchParams(location.search).get('c') ? 'placas' : nomeDoHash()
+
+history.replaceState({vista: vistaDeEntrada}, '', location.pathname + location.search) // tira o # do endereço
+mostrarVista(vistaDeEntrada)

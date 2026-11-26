@@ -1,6 +1,6 @@
 /* 
 Desenvolvido por Miguel Valério (mvaleriohub)
-24/11/2026 -- (11/24/2026)
+25/11/2026 -- (11/25/2026)
 */
 
 const urlSupabase = 'https://tzkiyfafjivsujrhzhsb.supabase.co'
@@ -24,7 +24,11 @@ const ChaveConfigurar = document.getElementById('chaveConfigurar')
 const Mensagem = document.getElementById('mensagem')
 const Busca = document.getElementById('busca')
 const NovaPlaca = document.getElementById('novaPlaca')
+const Chips = document.querySelectorAll('#filtros > button')
+const Gaveta = document.getElementById('gaveta')
 const Editor = document.getElementById('editor')
+const TituloEditor = document.getElementById('tituloEditor')
+const FecharGaveta = document.getElementById('fecharGaveta')
 const Lista = document.getElementById('lista')
 const CampoCodigo = document.getElementById('campoCodigo')
 const CampoCliente = document.getElementById('campoCliente')
@@ -40,8 +44,8 @@ const BaixarQr = document.getElementById('baixarQr')
 const PreviaQr = document.getElementById('previaQr')
 const DestinoQr = document.getElementById('destinoQr')
 const ExportarCsv = document.getElementById('exportarCsv')
-const Filtro = document.getElementById('filtro')
 const NovoLote = document.getElementById('novoLote')
+const DialogoLote = document.getElementById('dialogolote')
 const FormLote = document.getElementById('formLote')
 const CampoQuantidade = document.getElementById('campoQuantidade')
 const CancelarLote = document.getElementById('cancelarLote')
@@ -52,8 +56,12 @@ const TrocarModo = document.getElementById('trocarModo')
 const prefixoAvaliacao = 'https://search.google.com/local/writereview?placeid='
 const padraoAvaliacao = /^https:\/\/search\.google\.com\/local\/writereview\?placeid=([A-Za-z0-9_-]+)$/
 
+// três pontos do botão de ações de cada linha (conteúdo fixo, não vem do banco)
+const iconeMais = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>'
+
 let sessao = null
 let placas = []
+let filtro = 'ativas' // 'ativas' (padrão), 'lote', 'inativas' ou 'todas'
 let editando = null // código da placa aberta no editor; null quando é uma placa nova
 let modoLink = 'placeid' // 'placeid' (padrão) ou 'completo' (link digitado inteiro)
 let fatorId = null // id do fator do app autenticador (2FA) usado no login atual
@@ -140,18 +148,41 @@ function mostrarTela(tela) {
   TelaConfigurar.classList.toggle('oculto', tela != 'configurar')
   TelaPainel.classList.toggle('oculto', tela != 'painel')
   Sair.classList.toggle('oculto', tela == 'login')
+
+  // saiu do painel (sessão encerrada): nada de modal aberto esperando na volta
+  if (tela != 'painel') fecharDialogos()
+}
+
+function fecharDialogos() {
+  fecharMenuLinha()
+
+  for (const dialogo of document.querySelectorAll('dialog[open]')) {
+    dialogo.close()
+  }
 }
 
 function avisar(texto, erro = false) {
-  Mensagem.textContent = texto
-  Mensagem.classList.toggle('erro', erro)
+  // com um modal aberto a mensagem da página fica atrás dele, então o aviso aparece dentro do modal
+  const aberto = document.querySelector('dialog[open]')
+  const alvo = aberto ? aberto.querySelector('.avisomodal') : Mensagem
+
+  alvo.textContent = texto
+  alvo.classList.toggle('erro', erro)
   setTimeout(() => {
-    Mensagem.textContent = ''
+    alvo.textContent = ''
   }, 8000)
 }
 
 function hoje() {
   return new Date().toLocaleDateString('en-CA') // formato AAAA-MM-DD
+}
+
+function formatarData(texto) {
+  if (!texto) return '—'
+
+  // data_venda chega como AAAA-MM-DD; separar o texto evita o erro de fuso horário de new Date()
+  const [ano, mes, dia] = texto.slice(0, 10).split('-')
+  return `${dia}/${mes}/${ano}`
 }
 
 // ----- Lista -----
@@ -177,10 +208,10 @@ function estadoDaPlaca(placa) {
 }
 
 function passaFiltro(placa) {
-  if (Filtro.value == 'todas') return true
+  if (filtro == 'todas') return true
 
   const estados = {ativas: 'ativa', lote: 'lote', inativas: 'inativa'}
-  return estadoDaPlaca(placa) == estados[Filtro.value]
+  return estadoDaPlaca(placa) == estados[filtro]
 }
 
 // placas que aparecem na lista agora; o download de QRs em lote usa exatamente esta seleção
@@ -195,30 +226,135 @@ function placasDaLista() {
   })
 }
 
-function mostrarLista() {
-  Lista.replaceChildren()
+function definirFiltro(valor) {
+  filtro = valor
 
-  for (const placa of placasDaLista()) {
-
-    const item = document.createElement('li')
-    const codigo = document.createElement('strong')
-    const cliente = document.createElement('span')
-    const estado = document.createElement('small')
-
-    codigo.textContent = placa.codigo
-    cliente.textContent = placa.cliente || 'Sem cliente'
-    estado.textContent = {ativa: 'Ativa', lote: 'Em lote', inativa: 'Inativa'}[estadoDaPlaca(placa)]
-    item.classList.add(estadoDaPlaca(placa))
-    item.append(codigo, cliente, estado)
-    item.addEventListener('click', () => abrirEditor(placa.codigo))
-    Lista.appendChild(item)
+  for (const chip of Chips) {
+    chip.setAttribute('aria-pressed', chip.dataset.filtro == valor)
   }
 
-  if (!Lista.children.length) {
+  mostrarLista()
+}
+
+function atualizarContagens() {
+  const nomes = {ativa: 'ativas', lote: 'lote', inativa: 'inativas'}
+  const contagem = {ativas: 0, lote: 0, inativas: 0, todas: placas.length}
+
+  for (const placa of placas) {
+    contagem[nomes[estadoDaPlaca(placa)]]++
+  }
+
+  for (const chip of Chips) {
+    chip.querySelector('span').textContent = contagem[chip.dataset.filtro]
+  }
+}
+
+function criarLinha(placa) {
+  const estado = estadoDaPlaca(placa)
+  const item = document.createElement('li')
+  const codigo = document.createElement('strong')
+  const cliente = document.createElement('span')
+  const status = document.createElement('span')
+  const venda = document.createElement('span')
+  const cadastro = document.createElement('span')
+  const acoes = document.createElement('div')
+  const botao = document.createElement('button')
+
+  codigo.textContent = placa.codigo
+
+  cliente.className = placa.cliente ? 'cliente' : 'cliente semcliente'
+  cliente.textContent = placa.cliente || 'Sem cliente'
+
+  status.className = `status ${estado}`
+  status.textContent = {ativa: 'Ativa', lote: 'Em lote', inativa: 'Inativa'}[estado]
+
+  // no celular o rótulo aparece antes da data (CSS: data-rotulo); na tabela o cabeçalho faz esse papel
+  venda.className = 'venda'
+  venda.dataset.rotulo = 'Venda'
+  venda.textContent = formatarData(placa.data_venda)
+
+  cadastro.className = 'cadastro'
+  cadastro.dataset.rotulo = 'Cadastro'
+  cadastro.textContent = placa.criado_em ? new Date(placa.criado_em).toLocaleDateString('pt-BR') : '—'
+
+  acoes.className = 'acoes'
+  botao.type = 'button'
+  botao.className = 'icone'
+  botao.setAttribute('aria-label', `Ações da placa ${placa.codigo}`)
+  botao.setAttribute('aria-haspopup', 'menu')
+  botao.innerHTML = iconeMais
+  botao.addEventListener('click', (evento) => {
+    evento.stopPropagation() // senão o clique também abriria o editor da linha
+    alternarMenuLinha(acoes, placa.codigo)
+  })
+  acoes.appendChild(botao)
+
+  item.append(codigo, cliente, status, venda, cadastro, acoes)
+  item.addEventListener('click', () => abrirEditor(placa.codigo))
+  return item
+}
+
+function mostrarLista() {
+  fecharMenuLinha()
+  Lista.replaceChildren()
+  atualizarContagens()
+
+  const visiveis = placasDaLista()
+
+  for (const placa of visiveis) {
+    Lista.appendChild(criarLinha(placa))
+  }
+
+  if (!visiveis.length) {
     const vazio = document.createElement('li')
-    vazio.textContent = 'Nenhuma placa neste filtro.'
+    vazio.className = 'vazia'
+    vazio.textContent = Busca.value.trim() ? 'Nenhuma placa encontrada.' : 'Nenhuma placa neste filtro.'
     Lista.appendChild(vazio)
   }
+}
+
+// ----- Menu de ações da linha -----
+function fecharMenuLinha() {
+  const aberto = document.querySelector('.menulinha')
+
+  if (aberto) aberto.remove()
+}
+
+function criarItemMenu(texto, acao, perigo = false) {
+  const item = document.createElement('button')
+
+  item.type = 'button'
+  item.setAttribute('role', 'menuitem')
+  item.textContent = texto
+  if (perigo) item.classList.add('perigo')
+
+  item.addEventListener('click', (evento) => {
+    evento.stopPropagation()
+    fecharMenuLinha()
+    acao()
+  })
+
+  return item
+}
+
+function alternarMenuLinha(acoes, codigo) {
+  const eraDesteBotao = acoes.querySelector('.menulinha') != null
+
+  fecharMenuLinha()
+
+  if (eraDesteBotao) return
+
+  const menu = document.createElement('div')
+
+  menu.className = 'menulinha'
+  menu.setAttribute('role', 'menu')
+  menu.addEventListener('click', (evento) => evento.stopPropagation()) // clicar no espaço do menu não abre o editor
+  menu.append(
+    criarItemMenu('Editar', () => abrirEditor(codigo)),
+    criarItemMenu('Baixar QR', () => baixarQrDaLinha(codigo)),
+    criarItemMenu('Excluir', () => excluirPlaca(codigo), true)
+  )
+  acoes.appendChild(menu)
 }
 
 // ----- Editor -----
@@ -241,7 +377,12 @@ function abrirEditor(codigo) {
   const link = placa ? placa.link_avaliacao || '' : ''
   const achado = link.match(padraoAvaliacao)
 
+  for (const aviso of document.querySelectorAll('.avisomodal')) {
+    aviso.textContent = ''
+  }
+
   editando = placa ? placa.codigo : null
+  TituloEditor.textContent = editando ? `Placa ${editando}` : 'Nova placa'
   CampoCodigo.value = codigo
   CampoCodigo.disabled = editando != null // o código não muda depois de criado
   GerarCodigo.classList.toggle('oculto', editando != null)
@@ -265,9 +406,8 @@ function abrirEditor(codigo) {
   CampoData.value = placa && placa.data_venda ? placa.data_venda : hoje()
   Excluir.classList.toggle('oculto', editando == null) // só placas que já existem podem ser excluídas
   mostrarPreviaQr(editando)
-  FormLote.classList.add('oculto')
-  Editor.classList.remove('oculto')
-  Editor.scrollIntoView({behavior: 'smooth'})
+
+  if (!Gaveta.open) Gaveta.showModal()
 }
 
 function mostrarPreviaQr(codigo) {
@@ -286,7 +426,7 @@ function mostrarPreviaQr(codigo) {
 }
 
 function fecharEditor() {
-  Editor.classList.add('oculto')
+  Gaveta.close()
   editando = null
 }
 
@@ -313,9 +453,11 @@ function gerarCodigo() {
 
 // ----- Lote -----
 function abrirLote() {
-  Editor.classList.add('oculto')
-  editando = null
-  FormLote.classList.remove('oculto')
+  for (const aviso of document.querySelectorAll('.avisomodal')) {
+    aviso.textContent = ''
+  }
+
+  DialogoLote.showModal()
   CampoQuantidade.focus()
 }
 
@@ -354,10 +496,10 @@ async function gerarLote(evento) {
     return
   }
 
+  DialogoLote.close()
   avisar(`${quantidade} placas criadas em lote.`)
-  FormLote.classList.add('oculto')
-  Filtro.value = 'lote'
   await carregarPlacas()
+  definirFiltro('lote')
 }
 
 async function salvarPlaca(evento) {
@@ -425,15 +567,12 @@ async function salvarPlaca(evento) {
     return
   }
 
-  avisar('Salvo!')
   fecharEditor()
+  avisar('Salvo!')
   await carregarPlacas()
 }
 
-async function excluirPlaca() {
-  if (!editando) return
-
-  const codigo = editando
+async function excluirPlaca(codigo) {
   const placa = placas.find((p) => p.codigo == codigo)
   const aviso = placa && placa.ativa
     ? `A placa ${codigo} está ATIVA e vai parar de funcionar. Excluir mesmo? Não dá para desfazer.`
@@ -453,8 +592,9 @@ async function excluirPlaca() {
     return
   }
 
+  if (editando == codigo) fecharEditor()
+
   avisar(`Placa ${codigo} excluída.`)
-  fecharEditor()
   await carregarPlacas()
 }
 
@@ -464,6 +604,14 @@ async function baixarQrAtual() {
 
   try {
     await baixarQr(editando, FormatoQr.value)
+  } catch (erro) {
+    avisar(`Erro ao gerar o QR: ${erro.message}`, true)
+  }
+}
+
+async function baixarQrDaLinha(codigo) {
+  try {
+    await baixarQr(codigo, FormatoQr.value)
   } catch (erro) {
     avisar(`Erro ao gerar o QR: ${erro.message}`, true)
   }
@@ -711,15 +859,39 @@ Busca.addEventListener('input', mostrarLista)
 NovaPlaca.addEventListener('click', () => abrirEditor(''))
 GerarCodigo.addEventListener('click', gerarCodigo)
 NovoLote.addEventListener('click', abrirLote)
-CancelarLote.addEventListener('click', () => FormLote.classList.add('oculto'))
+CancelarLote.addEventListener('click', () => DialogoLote.close())
 FormLote.addEventListener('submit', gerarLote)
-Filtro.addEventListener('change', mostrarLista)
 Cancelar.addEventListener('click', fecharEditor)
-Excluir.addEventListener('click', excluirPlaca)
+FecharGaveta.addEventListener('click', fecharEditor)
+Excluir.addEventListener('click', () => {
+  if (editando) excluirPlaca(editando)
+})
 BaixarQr.addEventListener('click', baixarQrAtual)
 BaixarLote.addEventListener('click', baixarQrsDaLista)
 ExportarCsv.addEventListener('click', exportarPlacas)
 Editor.addEventListener('submit', salvarPlaca)
+
+for (const chip of Chips) {
+  chip.addEventListener('click', () => definirFiltro(chip.dataset.filtro))
+}
+
+// fechar o modal por qualquer caminho (Esc, botão ou clique no fundo) limpa a placa aberta
+Gaveta.addEventListener('close', () => {
+  editando = null
+})
+
+// clicar no fundo escuro (o alvo do clique é o próprio <dialog>) fecha o modal
+for (const dialogo of [Gaveta, DialogoLote]) {
+  dialogo.addEventListener('click', (evento) => {
+    if (evento.target == dialogo) dialogo.close()
+  })
+}
+
+// menu de ações aberto numa linha fecha ao clicar fora ou apertar Esc
+document.addEventListener('click', fecharMenuLinha)
+document.addEventListener('keydown', (evento) => {
+  if (evento.key == 'Escape') fecharMenuLinha()
+})
 
 // mostra para onde os QRs vão apontar, para conferir antes de imprimir
 DestinoQr.textContent = `Os QRs apontam para: ${urlDaPlaca('codigo')}`

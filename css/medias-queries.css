@@ -11,6 +11,16 @@
 @media screen and (min-width: 768px) {
     main {max-width: 640px; padding-top: 56px;}
     .acesso {margin-top: 72px;}
+    #tabela {border: 1px solid var(--borda); border-radius: 12px; background: var(--background2); box-shadow: var(--sombra);}
+    #tabela > #cabecalholista, #lista > li {grid-template-columns: 96px 1fr 104px 112px 112px 40px; grid-template-areas: "codigo cliente status venda cadastro acoes"; gap: 12px; padding: 10px 16px;}
+    #tabela > #cabecalholista {display: grid; padding-top: 12px; padding-bottom: 12px; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--font-color2);}
+    #tabela > #cabecalholista > span {color: inherit;}
+    #lista {display: block;}
+    #lista > li {border: none; border-top: 1px solid var(--borda); border-radius: 0; background: none; box-shadow: none;}
+    #lista > li:last-child {border-radius: 0 0 12px 12px;}
+    #lista > li > .status {justify-self: start;}
+    #lista > li > .venda, #lista > li > .cadastro {font-size: 14px;}
+    #lista > li > .venda::before, #lista > li > .cadastro::before {content: none;}
     #erro > picture {max-width: 420px;}
     #erro > #texto > h1 {font-size: 32px;}
     #erro > #texto > #placa > #confirmar {width: auto;}
@@ -41,4 +51,5 @@
     button, a.botao {transition: none;}
     .acesso > form > .campo > input {transition: none;}
     #painel > #menu, #painel > #menu > nav > a {transition: none;}
+    #gaveta[open] {animation: none;}
 }
