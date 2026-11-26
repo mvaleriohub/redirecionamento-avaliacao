@@ -244,35 +244,37 @@ main {
     gap: 8px;
 }
 
-.acesso > form > .cabecalho > .marca {
+/* Marca */
+.marca {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 8px;
 }
 
-.acesso > form > .cabecalho > .marca > svg {
+.acesso > form > .cabecalho > .marca {margin-bottom: 8px;}
+
+.marca > svg {
     width: 28px;
     height: 28px;
 }
 
-.acesso > form > .cabecalho > .marca > svg > circle:nth-child(1) {
+.marca > svg > circle:nth-child(1) {
     fill: var(--azul);
 }
 
-.acesso > form > .cabecalho > .marca > svg > circle:nth-child(2) {
+.marca > svg > circle:nth-child(2) {
     fill: var(--vermelho);
 }
 
-.acesso > form > .cabecalho > .marca > svg > circle:nth-child(3) {
+.marca > svg > circle:nth-child(3) {
     fill: var(--amarelo);
 }
 
-.acesso > form > .cabecalho > .marca > svg > circle:nth-child(4) {
+.marca > svg > circle:nth-child(4) {
     fill: var(--verde);
 }
 
-.acesso > form > .cabecalho > .marca > span {
+.marca > span {
     font-size: 14px;
     font-weight: 600;
 }
@@ -472,4 +474,240 @@ body.painel > header > button {
 
 .textual:hover {
     background: none;
+}
+
+/* Painel: estrutura (menu lateral, topo e vistas) */
+body.painel:has(#painel:not(.oculto)) > header,
+body.painel:has(#painel:not(.oculto)) > main {
+    display: none;
+}
+
+#painel > #menu {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 260px;
+    padding: 20px 12px;
+    border-right: 1px solid var(--borda);
+    background: var(--background2);
+    visibility: hidden;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease, visibility 0.2s;
+}
+
+#painel > #menu.aberto {
+    visibility: visible;
+    transform: none;
+}
+
+#painel > #menu > .marca {
+    padding: 0 12px;
+}
+
+#painel > #menu > .marca > span {
+    font-weight: 600;
+}
+
+#painel > #menu > nav {
+    display: grid;
+    gap: 2px;
+}
+
+#painel > #menu > nav > a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 8px;
+    color: var(--font-color2);
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+#painel > #menu > nav > a > svg {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    fill: none;
+    stroke: var(--font-color2);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+#painel > #menu > nav > a:hover,
+#painel > #menu > nav > a[aria-current="page"] {
+    background: var(--background3);
+    color: var(--font-color);
+}
+
+#painel > #menu > nav > a:hover > svg {
+    stroke: var(--font-color);
+}
+
+#painel > #menu > nav > a[aria-current="page"] > svg {
+    stroke: var(--primary);
+}
+
+/* Fundo escuro atrás do menu no celular */
+#painel > #fundomenu {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+#painel > #conteudo {
+    min-width: 0;
+}
+
+/* Topo */
+#painel > #conteudo > #topo {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--borda);
+    background: var(--background2);
+}
+
+#topo > h1 {
+    flex: 1;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--font-color);
+}
+
+#topo > #ferramentas {
+    display: flex;
+    gap: 8px;
+}
+
+button.icone {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    background: var(--background2);
+}
+
+button.icone:hover {
+    background: var(--background3);
+}
+
+button.icone > svg,
+#menuconta > button > svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: var(--font-color);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Ícone do tema: lua no claro, sol no escuro */
+#alternarTema > svg.sol {
+    display: none;
+}
+
+:root[data-tema="escuro"] #alternarTema > svg.sol {
+    display: block;
+}
+
+:root[data-tema="escuro"] #alternarTema > svg.lua {
+    display: none;
+}
+
+/* Conta */
+#conta {
+    position: relative;
+}
+
+#menuconta {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 30;
+    display: grid;
+    gap: 4px;
+    min-width: 220px;
+    padding: 12px;
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    background: var(--background2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+#menuconta > p {
+    font-size: 12px;
+    color: var(--font-color2);
+}
+
+#menuconta > #emailConta {
+    margin-bottom: 8px;
+    font-size: 13px;
+    word-break: break-all;
+    color: var(--font-color);
+}
+
+#menuconta > button {
+    justify-content: flex-start;
+    padding: 8px;
+    font-weight: 500;
+    background: none;
+    color: var(--font-color);
+}
+
+#menuconta > button:hover {
+    background: var(--background3);
+}
+
+/* Vistas */
+#painel > #conteudo > main {
+    display: block;
+    max-width: 960px;
+    min-height: 0;
+    margin: 0 auto;
+    padding: 16px 16px 48px;
+}
+
+#mensagem:empty {
+    display: none;
+}
+
+.vista > .vazio {
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    padding: 48px 24px;
+    text-align: center;
+    border: 1px dashed var(--borda);
+    border-radius: 12px;
+    background: var(--background2);
+}
+
+.vista > .vazio > p {
+    color: var(--font-color2);
+}
+
+.vista > .vazio > p:first-child {
+    font-weight: 600;
+    color: var(--font-color);
+}
+
+.vista > .vazio > p > a {
+    color: var(--primary);
 }

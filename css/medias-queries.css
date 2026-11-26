@@ -26,8 +26,19 @@
     #erro > #texto > #placa {justify-items: start; text-align: left;}
 }
 
+/* Desktop: menu lateral fixo */
+@media screen and (min-width: 900px) {
+    #painel {display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 4px);}
+    #painel > #menu {position: sticky; z-index: auto; align-self: start; width: auto; height: 100vh; visibility: visible; transform: none; transition: none;}
+    #painel > #fundomenu {display: none !important;}
+    #painel > #conteudo > #topo {padding: 14px 32px;}
+    #topo > #abrirmenu {display: none;}
+    #painel > #conteudo > main {padding: 32px 32px 64px;}
+}
+
 /* Reduzir movimento, se o sistema pedir */
 @media (prefers-reduced-motion: reduce) {
     button, a.botao {transition: none;}
     .acesso > form > .campo > input {transition: none;}
+    #painel > #menu, #painel > #menu > nav > a {transition: none;}
 }
