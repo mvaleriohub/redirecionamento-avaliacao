@@ -20,7 +20,7 @@ Cada placa tem um código curto (`k7x2`). O link vendido ao cliente é sempre `.
 ## O que tem
 
 - **Redirecionamento:** lê o código da URL, pergunta o destino ao banco e redireciona. Se algo falhar, cai na página 404. A página não carrega CSS, fontes nem imagens, para ser o mais rápida possível.
-- **Painel de administração** (`html/painel`), com menu lateral e as seções:
+- **Painel de administração** (`/painel`), com menu lateral e as seções:
   - **Dashboard:** total, ativas, em estoque e inativas, últimas vendas e atalhos;
   - **Placas:** busca, filtros (ativas, em lote, inativas e todas), tabela no computador e cartões no celular; cadastro, edição pelo Place ID (ou link completo, quando o formato for outro), exclusão e QR de cada placa pelo menu da linha;
   - **Estoque e lotes:** geração de lote de códigos inativos (1 a 100), códigos agrupados por lote e busca por código;
@@ -44,8 +44,8 @@ Cada placa tem um código curto (`k7x2`). O link vendido ao cliente é sempre `.
 
 ```
 index.html                página de redirecionamento
-404.html                  página de erro (a raiz é o único lugar que o GitHub Pages usa)
-html/painel.html          painel de administração
+404.html                  página de erro (precisa ficar na raiz, é o único lugar que o GitHub Pages usa)
+painel.html               painel de administração
 css/
   style.css               tokens, tema claro e escuro, componentes, 404 e painel
   medias-queries.css      breakpoints 481, 768 e 900 e redução de movimento
@@ -69,7 +69,7 @@ img/                      mascote da página 404
 3. **Chaves.** Cole a Project URL e a Publishable key em `js/redirecionar.js`, `js/painel.js`, no `preconnect` do `index.html` e no workflow. A chave *secret* (`service_role`) nunca vai para o repositório.
 4. **WhatsApp.** Em `js/contato.js`, coloque o número (código do país, DDD e número, só dígitos).
 5. **GitHub Pages.** Em Settings → Pages, publique a partir da branch `main`, pasta raiz.
-6. **Primeiro acesso.** Abra `/html/painel`, entre e configure a verificação em duas etapas. Só depois de confirmar que o login com código funciona, rode a política do SQL que exige o 2FA (já está no script abaixo, no final).
+6. **Primeiro acesso.** Abra `/painel`, entre e configure a verificação em duas etapas. Só depois de confirmar que o login com código funciona, rode a política do SQL que exige o 2FA (já está no script abaixo, no final).
 
 <details>
 <summary>SQL do banco</summary>
