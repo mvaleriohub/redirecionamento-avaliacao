@@ -1142,3 +1142,173 @@ h2#tituloEditor,
 .menulinha > button.perigo:hover {
     background: color-mix(in srgb, var(--erro) 10%, transparent);
 }
+
+/* Dashboard */
+#resumo {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+#resumo > div {
+    display: grid;
+    gap: 4px;
+    padding: 16px;
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    background: var(--background2);
+    box-shadow: var(--sombra);
+}
+
+#resumo > div > p {
+    font-size: 13px;
+    color: var(--font-color2);
+}
+
+#resumo > div > strong {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+#paineis {
+    display: grid;
+    gap: 16px;
+}
+
+.caixa {
+    display: grid;
+    align-content: start;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    background: var(--background2);
+    box-shadow: var(--sombra);
+}
+
+.caixa > h2 {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.atalhos {
+    display: grid;
+    gap: 8px;
+}
+
+#recentes {
+    display: grid;
+    list-style: none;
+}
+
+#recentes > li {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 8px;
+    border-top: 1px solid var(--borda);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#recentes > li:first-child {
+    border-top: none;
+}
+
+#recentes > li:hover {
+    background: var(--background3);
+}
+
+#recentes > li > strong {
+    font-family: var(--font-mono);
+    font-weight: 500;
+}
+
+#recentes > li > span:last-child {
+    font-size: 13px;
+    color: var(--font-color2);
+}
+
+#recentes > li.vazia {
+    display: block;
+    padding: 24px 8px;
+    text-align: center;
+    cursor: default;
+    color: var(--font-color2);
+}
+
+#recentes > li.vazia:hover {
+    background: none;
+}
+
+/* Estoque e lotes */
+#resumoestoque {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+#resumoestoque > p > strong {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+#barraestoque {
+    margin-bottom: 4px;
+}
+
+#barraestoque > input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 16px;
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    background: var(--background2);
+}
+
+#barraestoque > input:focus-visible {
+    outline: none;
+    border-color: var(--foco);
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.25);
+}
+
+.grupolote {
+    display: grid;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.grupolote > h3 {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--font-color2);
+}
+
+.grupolote > ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    gap: 8px;
+    list-style: none;
+}
+
+.grupolote > ul > li > button {
+    width: 100%;
+    padding: 8px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.semlotes {
+    margin-top: 20px;
+    padding: 32px 16px;
+    text-align: center;
+    border: 1px dashed var(--borda);
+    border-radius: 12px;
+    color: var(--font-color2);
+}

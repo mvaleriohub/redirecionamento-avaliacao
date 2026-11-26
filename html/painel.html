@@ -102,7 +102,7 @@
         <div id="conteudo">
             <header id="topo">
                 <button type="button" id="abrirmenu" class="icone" aria-label="Abrir menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg></button>
-                <h1 id="tituloVista">Placas</h1>
+                <h1 id="tituloVista">Dashboard</h1>
                 <div id="ferramentas">
                     <button type="button" id="alternarTema" class="icone" aria-label="Alternar tema claro e escuro">
                         <svg class="lua" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
@@ -121,9 +121,25 @@
             <main>
                     <p id="mensagem"></p>
                 <section class="vista oculto" data-vista="dashboard">
-                    <div class="vazio">
-                        <p>Em breve</p>
-                        <p>Por enquanto, placas, lotes, QRs e backup ficam em <a href="#placas" data-vista="placas">Placas</a>.</p>
+                    <div id="resumo">
+                        <div><p>Total de placas</p><strong id="numTotal">0</strong></div>
+                        <div><p>Ativas</p><strong id="numAtivas">0</strong></div>
+                        <div><p>Em estoque</p><strong id="numEstoque">0</strong></div>
+                        <div><p>Inativas</p><strong id="numInativas">0</strong></div>
+                    </div>
+                    <div id="paineis">
+                        <div class="caixa">
+                            <h2>Últimas vendas</h2>
+                            <ul id="recentes"></ul>
+                        </div>
+                        <div class="caixa">
+                            <h2>Atalhos</h2>
+                            <div class="atalhos">
+                                <button type="button" id="atalhoNovaPlaca">Nova placa</button>
+                                <button type="button" id="atalhoLote" class="secundario">Gerar lote</button>
+                                <button type="button" id="atalhoEstoque" class="secundario">Ver estoque</button>
+                            </div>
+                        </div>
                     </div>
                 </section>
                 <section class="vista oculto" data-vista="placas">
@@ -140,7 +156,6 @@
                     <details id="maisacoes">
                         <summary>Mais ações</summary>
                         <div>
-                            <button type="button" id="novoLote" class="secundario">Cadastrar lote inativo</button>
                             <select id="formatoQr" aria-label="Formato do QR">
                                 <option value="svg">QR em SVG</option>
                                 <option value="png">QR em PNG</option>
@@ -161,66 +176,16 @@
                         </div>
                         <ul id="lista"></ul>
                     </div>
-                    <dialog id="gaveta" aria-labelledby="tituloEditor">
-                        <form id="editor">
-                            <div class="topogaveta">
-                                <h2 id="tituloEditor">Nova placa</h2>
-                                <button type="button" id="fecharGaveta" class="icone" aria-label="Fechar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
-                            </div>
-                            <div class="campo">
-                                <label for="campoCodigo">Código</label>
-                                <div class="linha">
-                                    <input type="text" id="campoCodigo" maxlength="12" autocapitalize="off" autocomplete="off">
-                                    <button type="button" id="gerarCodigo" class="secundario">Gerar</button>
-                                </div>
-                            </div>
-                            <div class="campo">
-                                <label for="campoCliente">Cliente</label>
-                                <input type="text" id="campoCliente" autocomplete="off">
-                            </div>
-                            <div class="campo">
-                                <label for="campoLink" id="rotuloLink">Place ID</label>
-                                <input type="text" id="campoLink" placeholder="Cole o Place ID (ChIJ...)" autocomplete="off">
-                                <button type="button" id="trocarModo" class="textual">Usar o link completo</button>
-                            </div>
-                            <label class="opcao"><input type="checkbox" id="campoAtiva"> Placa ativa</label>
-                            <div class="campo">
-                                <label for="campoData">Data da venda</label>
-                                <input type="date" id="campoData">
-                            </div>
-                            <div id="previaQr" class="oculto"></div>
-                            <button type="button" id="baixarQr" class="secundario oculto">Baixar QR desta placa</button>
-                            <p class="avisomodal" role="alert"></p>
-                            <div class="rodape">
-                                <button type="submit">Salvar</button>
-                                <button type="button" id="cancelar" class="secundario">Cancelar</button>
-                            </div>
-                            <button type="button" id="excluir" class="perigo oculto">Excluir placa</button>
-                        </form>
-                    </dialog>
-                    <dialog id="dialogolote" aria-labelledby="tituloLote">
-                        <form id="formLote">
-                            <div class="cabecalho">
-                                <h2 id="tituloLote">Cadastrar lote inativo</h2>
-                                <p class="subtitulo">Cria placas sem cliente e sem link, prontas para imprimir os QRs.</p>
-                            </div>
-                            <div class="campo">
-                                <label for="campoQuantidade">Quantidade de placas</label>
-                                <input type="number" id="campoQuantidade" min="1" max="100" value="10">
-                            </div>
-                            <p class="avisomodal" role="alert"></p>
-                            <div class="rodape">
-                                <button type="submit">Gerar lote</button>
-                                <button type="button" id="cancelarLote" class="secundario">Cancelar</button>
-                            </div>
-                        </form>
-                    </dialog>
                 </section>
                 <section class="vista oculto" data-vista="estoque">
-                    <div class="vazio">
-                        <p>Em breve</p>
-                        <p>Por enquanto, placas, lotes, QRs e backup ficam em <a href="#placas" data-vista="placas">Placas</a>.</p>
+                    <div id="resumoestoque" class="caixa">
+                        <p><strong id="totalEstoque">0</strong> placas em estoque</p>
+                        <button type="button" id="novoLote">Gerar lote</button>
                     </div>
+                    <div id="barraestoque">
+                        <input type="search" id="buscaEstoque" placeholder="Localizar código" aria-label="Localizar código no estoque">
+                    </div>
+                    <div id="codigosEstoque"></div>
                 </section>
                 <section class="vista oculto" data-vista="qr">
                     <div class="vazio">
@@ -240,6 +205,60 @@
                         <p>Por enquanto, placas, lotes, QRs e backup ficam em <a href="#placas" data-vista="placas">Placas</a>.</p>
                     </div>
                 </section>
+                <dialog id="gaveta" aria-labelledby="tituloEditor">
+                    <form id="editor">
+                        <div class="topogaveta">
+                            <h2 id="tituloEditor">Nova placa</h2>
+                            <button type="button" id="fecharGaveta" class="icone" aria-label="Fechar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+                        </div>
+                        <div class="campo">
+                            <label for="campoCodigo">Código</label>
+                            <div class="linha">
+                                <input type="text" id="campoCodigo" maxlength="12" autocapitalize="off" autocomplete="off">
+                                <button type="button" id="gerarCodigo" class="secundario">Gerar</button>
+                            </div>
+                        </div>
+                        <div class="campo">
+                            <label for="campoCliente">Cliente</label>
+                            <input type="text" id="campoCliente" autocomplete="off">
+                        </div>
+                        <div class="campo">
+                            <label for="campoLink" id="rotuloLink">Place ID</label>
+                            <input type="text" id="campoLink" placeholder="Cole o Place ID (ChIJ...)" autocomplete="off">
+                            <button type="button" id="trocarModo" class="textual">Usar o link completo</button>
+                        </div>
+                        <label class="opcao"><input type="checkbox" id="campoAtiva"> Placa ativa</label>
+                        <div class="campo">
+                            <label for="campoData">Data da venda</label>
+                            <input type="date" id="campoData">
+                        </div>
+                        <div id="previaQr" class="oculto"></div>
+                        <button type="button" id="baixarQr" class="secundario oculto">Baixar QR desta placa</button>
+                        <p class="avisomodal" role="alert"></p>
+                        <div class="rodape">
+                            <button type="submit">Salvar</button>
+                            <button type="button" id="cancelar" class="secundario">Cancelar</button>
+                        </div>
+                        <button type="button" id="excluir" class="perigo oculto">Excluir placa</button>
+                    </form>
+                </dialog>
+                <dialog id="dialogolote" aria-labelledby="tituloLote">
+                    <form id="formLote">
+                        <div class="cabecalho">
+                            <h2 id="tituloLote">Cadastrar lote inativo</h2>
+                            <p class="subtitulo">Cria placas sem cliente e sem link, prontas para imprimir os QRs.</p>
+                        </div>
+                        <div class="campo">
+                            <label for="campoQuantidade">Quantidade de placas</label>
+                            <input type="number" id="campoQuantidade" min="1" max="100" value="10">
+                        </div>
+                        <p class="avisomodal" role="alert"></p>
+                        <div class="rodape">
+                            <button type="submit">Gerar lote</button>
+                            <button type="button" id="cancelarLote" class="secundario">Cancelar</button>
+                        </div>
+                    </form>
+                </dialog>
             </main>
         </div>
     </section>

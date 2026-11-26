@@ -21,6 +21,8 @@
     #lista > li > .status {justify-self: start;}
     #lista > li > .venda, #lista > li > .cadastro {font-size: 14px;}
     #lista > li > .venda::before, #lista > li > .cadastro::before {content: none;}
+    #resumo {grid-template-columns: repeat(4, 1fr);}
+    #paineis {grid-template-columns: 1fr 280px; align-items: start;}
     #erro > picture {max-width: 420px;}
     #erro > #texto > h1 {font-size: 32px;}
     #erro > #texto > #placa > #confirmar {width: auto;}

@@ -28,7 +28,7 @@ const titulos = {
   config: 'Configurações'
 }
 
-const vistaInicial = 'placas' // vira 'dashboard' quando o dashboard existir (Fase 6)
+const vistaInicial = 'dashboard'
 
 // ----- Vistas -----
 let vistaAtual = null
@@ -153,8 +153,8 @@ window.addEventListener('popstate', (evento) => {
 // ao passar para a tela grande o menu já fica fixo, então o fundo escuro sai
 matchMedia('(min-width: 900px)').addEventListener('change', fecharMenu)
 
-// painel?c=k7x2 abre a placa pelo painel.js, e o editor fica na vista Placas
-const vistaDeEntrada = new URLSearchParams(location.search).get('c') ? 'placas' : nomeDoHash()
+// painel?c=k7x2 abre a placa pelo painel.js; o editor é um modal e abre sobre qualquer vista
+const vistaDeEntrada = nomeDoHash()
 
 history.replaceState({vista: vistaDeEntrada}, '', location.pathname + location.search) // tira o # do endereço
 mostrarVista(vistaDeEntrada)

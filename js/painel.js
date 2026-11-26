@@ -30,6 +30,17 @@ const Editor = document.getElementById('editor')
 const TituloEditor = document.getElementById('tituloEditor')
 const FecharGaveta = document.getElementById('fecharGaveta')
 const Lista = document.getElementById('lista')
+const NumTotal = document.getElementById('numTotal')
+const NumAtivas = document.getElementById('numAtivas')
+const NumEstoque = document.getElementById('numEstoque')
+const NumInativas = document.getElementById('numInativas')
+const Recentes = document.getElementById('recentes')
+const AtalhoNovaPlaca = document.getElementById('atalhoNovaPlaca')
+const AtalhoLote = document.getElementById('atalhoLote')
+const AtalhoEstoque = document.getElementById('atalhoEstoque')
+const TotalEstoque = document.getElementById('totalEstoque')
+const BuscaEstoque = document.getElementById('buscaEstoque')
+const CodigosEstoque = document.getElementById('codigosEstoque')
 const CampoCodigo = document.getElementById('campoCodigo')
 const CampoCliente = document.getElementById('campoCliente')
 const CampoLink = document.getElementById('campoLink')
@@ -198,6 +209,8 @@ async function carregarPlacas() {
 
   placas = await resposta.json()
   mostrarLista()
+  mostrarDashboard()
+  mostrarEstoque()
 }
 
 // ativa; lote (inativa e sem cliente nem link, ainda não vendida); inativa (já teve dados, foi desativada)
@@ -236,13 +249,19 @@ function definirFiltro(valor) {
   mostrarLista()
 }
 
-function atualizarContagens() {
+function contarPlacas() {
   const nomes = {ativa: 'ativas', lote: 'lote', inativa: 'inativas'}
   const contagem = {ativas: 0, lote: 0, inativas: 0, todas: placas.length}
 
   for (const placa of placas) {
     contagem[nomes[estadoDaPlaca(placa)]]++
   }
+
+  return contagem
+}
+
+function atualizarContagens() {
+  const contagem = contarPlacas()
 
   for (const chip of Chips) {
     chip.querySelector('span').textContent = contagem[chip.dataset.filtro]
@@ -310,6 +329,96 @@ function mostrarLista() {
     vazio.className = 'vazia'
     vazio.textContent = Busca.value.trim() ? 'Nenhuma placa encontrada.' : 'Nenhuma placa neste filtro.'
     Lista.appendChild(vazio)
+  }
+}
+
+// ----- Dashboard -----
+function mostrarDashboard() {
+  const contagem = contarPlacas()
+
+  NumTotal.textContent = contagem.todas
+  NumAtivas.textContent = contagem.ativas
+  NumEstoque.textContent = contagem.lote
+  NumInativas.textContent = contagem.inativas
+
+  // últimas 5 vendas: placas com data de venda, da mais recente para a mais antiga
+  const vendidas = placas
+    .filter((placa) => placa.data_venda)
+    .sort((a, b) => b.data_venda.localeCompare(a.data_venda))
+    .slice(0, 5)
+
+  Recentes.replaceChildren()
+
+  for (const placa of vendidas) {
+    const item = document.createElement('li')
+    const codigo = document.createElement('strong')
+    const cliente = document.createElement('span')
+    const venda = document.createElement('span')
+
+    codigo.textContent = placa.codigo
+    cliente.textContent = placa.cliente || 'Sem cliente'
+    venda.textContent = formatarData(placa.data_venda)
+    item.append(codigo, cliente, venda)
+    item.addEventListener('click', () => abrirEditor(placa.codigo))
+    Recentes.appendChild(item)
+  }
+
+  if (!vendidas.length) {
+    const vazio = document.createElement('li')
+    vazio.className = 'vazia'
+    vazio.textContent = 'Nenhuma venda registrada ainda.'
+    Recentes.appendChild(vazio)
+  }
+}
+
+// ----- Estoque e lotes -----
+function mostrarEstoque() {
+  const termo = BuscaEstoque.value.trim().toLowerCase()
+  const emLote = placas.filter((placa) => estadoDaPlaca(placa) == 'lote')
+  const encontradas = emLote.filter((placa) => placa.codigo.includes(termo))
+  const grupos = new Map()
+
+  TotalEstoque.textContent = emLote.length
+  CodigosEstoque.replaceChildren()
+
+  // placas criadas no mesmo lote têm o mesmo criado_em, então ele serve de chave do grupo
+  for (const placa of encontradas) {
+    const chave = placa.criado_em || ''
+
+    if (!grupos.has(chave)) grupos.set(chave, [])
+    grupos.get(chave).push(placa)
+  }
+
+  for (const [chave, grupo] of grupos) {
+    const bloco = document.createElement('section')
+    const titulo = document.createElement('h3')
+    const codigos = document.createElement('ul')
+    const data = chave ? new Date(chave).toLocaleString('pt-BR', {dateStyle: 'short', timeStyle: 'short'}) : 'sem data'
+
+    bloco.className = 'grupolote'
+    titulo.textContent = `Lote de ${data} · ${grupo.length} ${grupo.length == 1 ? 'placa' : 'placas'}`
+
+    for (const placa of grupo) {
+      const item = document.createElement('li')
+      const botao = document.createElement('button')
+
+      botao.type = 'button'
+      botao.className = 'secundario'
+      botao.textContent = placa.codigo
+      botao.addEventListener('click', () => abrirEditor(placa.codigo))
+      item.appendChild(botao)
+      codigos.appendChild(item)
+    }
+
+    bloco.append(titulo, codigos)
+    CodigosEstoque.appendChild(bloco)
+  }
+
+  if (!encontradas.length) {
+    const vazio = document.createElement('p')
+    vazio.className = 'semlotes'
+    vazio.textContent = termo ? 'Nenhum código encontrado.' : 'Nenhuma placa em estoque. Gere um lote para começar.'
+    CodigosEstoque.appendChild(vazio)
   }
 }
 
@@ -499,7 +608,6 @@ async function gerarLote(evento) {
   DialogoLote.close()
   avisar(`${quantidade} placas criadas em lote.`)
   await carregarPlacas()
-  definirFiltro('lote')
 }
 
 async function salvarPlaca(evento) {
@@ -859,6 +967,10 @@ Busca.addEventListener('input', mostrarLista)
 NovaPlaca.addEventListener('click', () => abrirEditor(''))
 GerarCodigo.addEventListener('click', gerarCodigo)
 NovoLote.addEventListener('click', abrirLote)
+AtalhoNovaPlaca.addEventListener('click', () => abrirEditor(''))
+AtalhoLote.addEventListener('click', abrirLote)
+AtalhoEstoque.addEventListener('click', () => irParaVista('estoque')) // irParaVista vem do navegacao.js
+BuscaEstoque.addEventListener('input', mostrarEstoque)
 CancelarLote.addEventListener('click', () => DialogoLote.close())
 FormLote.addEventListener('submit', gerarLote)
 Cancelar.addEventListener('click', fecharEditor)
