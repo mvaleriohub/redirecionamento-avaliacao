@@ -4,7 +4,7 @@ Desenvolvido por Miguel Valério (mvaleriohub)
 */
 
 // Estrutura do painel: vistas (endereço sempre sem #), menu lateral no celular, tema e conta.
-// Depende de painel.js (usa sessao e encerrarSessao) e de tema.js (alternarTema)
+// Depende de painel.js (sessao, encerrarSessao, emailDaSessao, mostrarConfig) e de tema.js (alternarTema)
 
 const Menu = document.getElementById('menu')
 const FundoMenu = document.getElementById('fundomenu')
@@ -56,6 +56,7 @@ function mostrarVista(nome) {
   }
 
   TituloVista.textContent = titulos[nome]
+  if (nome == 'config') mostrarConfig() // atualiza a validade da sessão a cada visita
   fecharMenu()
   fecharConta()
 }
@@ -85,16 +86,6 @@ function fecharMenu() {
 }
 
 // ----- Conta -----
-function emailDaSessao() {
-  // o e-mail vem no próprio token da sessão
-  try {
-    const carga = sessao.token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
-    return JSON.parse(atob(carga)).email || ''
-  } catch (erro) {
-    return ''
-  }
-}
-
 function fecharConta() {
   MenuConta.classList.add('oculto')
   BotaoConta.setAttribute('aria-expanded', 'false')

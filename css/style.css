@@ -1173,7 +1173,8 @@ h2#tituloEditor,
     letter-spacing: -0.02em;
 }
 
-#paineis {
+#paineis,
+#paineisqr {
     display: grid;
     gap: 16px;
 }
@@ -1311,4 +1312,86 @@ h2#tituloEditor,
     border: 1px dashed var(--borda);
     border-radius: 12px;
     color: var(--font-color2);
+}
+
+/* Gerador de QR, Backup e Configurações */
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button:disabled:hover {
+    background: var(--primary);
+}
+
+button.secundario:disabled:hover {
+    background: var(--background2);
+}
+
+#qrPrevia {
+    justify-self: center;
+    width: 100%;
+    max-width: 220px;
+    padding: 10px;
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    background: var(--font-color-reverse); /* fundo branco também no tema escuro, para o QR ser lido */
+}
+
+#qrPrevia > svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.caixa > .rodape > select {
+    flex: 0 0 auto;
+}
+
+.caixa > .rodape > #baixarQrPlaca {
+    flex: 1;
+}
+
+.vista > #destinoQr {
+    margin-top: 12px;
+    font-size: 12px;
+    word-break: break-all;
+    color: var(--font-color2);
+}
+
+.caixa > .atencao {
+    padding: 10px 12px;
+    font-size: 13px;
+    border-left: 3px solid var(--atencao);
+    border-radius: 8px;
+    background: var(--background3);
+}
+
+.caixa > button {
+    justify-self: start;
+}
+
+#dadosConfig {
+    display: grid;
+}
+
+#dadosConfig > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0;
+    border-top: 1px solid var(--borda);
+}
+
+#dadosConfig > div:first-child {
+    border-top: none;
+}
+
+#dadosConfig > div > dt {
+    color: var(--font-color2);
+}
+
+#dadosConfig > div > dd {
+    text-align: right;
+    word-break: break-word;
 }

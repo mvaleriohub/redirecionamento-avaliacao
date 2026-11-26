@@ -41,6 +41,19 @@ const AtalhoEstoque = document.getElementById('atalhoEstoque')
 const TotalEstoque = document.getElementById('totalEstoque')
 const BuscaEstoque = document.getElementById('buscaEstoque')
 const CodigosEstoque = document.getElementById('codigosEstoque')
+const QrCodigo = document.getElementById('qrCodigo')
+const CodigosQr = document.getElementById('codigosQr')
+const QrAviso = document.getElementById('qrAviso')
+const QrPrevia = document.getElementById('qrPrevia')
+const BaixarQrPlaca = document.getElementById('baixarQrPlaca')
+const EscopoZip = document.getElementById('escopoZip')
+const TotalBackup = document.getElementById('totalBackup')
+const UltimoBackup = document.getElementById('ultimoBackup')
+const AvisoLimite = document.getElementById('avisoLimite')
+const CfgEmail = document.getElementById('cfgEmail')
+const CfgDuasEtapas = document.getElementById('cfgDuasEtapas')
+const CfgNivel = document.getElementById('cfgNivel')
+const CfgSessao = document.getElementById('cfgSessao')
 const CampoCodigo = document.getElementById('campoCodigo')
 const CampoCliente = document.getElementById('campoCliente')
 const CampoLink = document.getElementById('campoLink')
@@ -211,6 +224,9 @@ async function carregarPlacas() {
   mostrarLista()
   mostrarDashboard()
   mostrarEstoque()
+  preencherQr()
+  mostrarBackup()
+  mostrarConfig()
 }
 
 // ativa; lote (inativa e sem cliente nem link, ainda não vendida); inativa (já teve dados, foi desativada)
@@ -227,7 +243,7 @@ function passaFiltro(placa) {
   return estadoDaPlaca(placa) == estados[filtro]
 }
 
-// placas que aparecem na lista agora; o download de QRs em lote usa exatamente esta seleção
+// placas que aparecem na lista agora
 function placasDaLista() {
   const termo = Busca.value.trim().toLowerCase()
 
@@ -725,11 +741,20 @@ async function baixarQrDaLinha(codigo) {
   }
 }
 
+// placas do grupo escolhido no Gerador de QR (em estoque, ativas, inativas ou todas)
+function placasDoEscopo() {
+  const estados = {lote: 'lote', ativas: 'ativa', inativas: 'inativa'}
+
+  if (EscopoZip.value == 'todas') return placas
+
+  return placas.filter((placa) => estadoDaPlaca(placa) == estados[EscopoZip.value])
+}
+
 async function baixarQrsDaLista() {
-  const codigos = placasDaLista().map((p) => p.codigo)
+  const codigos = placasDoEscopo().map((p) => p.codigo)
 
   if (!codigos.length) {
-    avisar('Nenhuma placa na lista.', true)
+    avisar('Nenhuma placa neste grupo.', true)
     return
   }
 
@@ -743,11 +768,69 @@ async function baixarQrsDaLista() {
     avisar(`Erro ao gerar os QRs: ${erro.message}`, true)
   } finally {
     BaixarLote.disabled = false
-    BaixarLote.textContent = 'Baixar QRs da lista (ZIP)'
+    BaixarLote.textContent = 'Baixar QRs (ZIP)'
+  }
+}
+
+// ----- Gerador de QR (vista) -----
+const rotulosEscopo = {lote: 'Em estoque', ativas: 'Ativas', inativas: 'Inativas', todas: 'Todas'}
+
+function preencherQr() {
+  const contagem = contarPlacas()
+
+  for (const opcao of EscopoZip.options) {
+    opcao.textContent = `${rotulosEscopo[opcao.value]} (${contagem[opcao.value]})`
+  }
+
+  CodigosQr.replaceChildren()
+
+  for (const placa of placas) {
+    const opcao = document.createElement('option')
+
+    opcao.value = placa.codigo
+    opcao.textContent = placa.cliente || ''
+    CodigosQr.appendChild(opcao)
+  }
+
+  atualizarPreviaQr()
+}
+
+function atualizarPreviaQr() {
+  const codigo = QrCodigo.value.trim().toLowerCase()
+  const achou = placas.some((placa) => placa.codigo == codigo)
+
+  QrPrevia.innerHTML = ''
+  QrPrevia.classList.toggle('oculto', !achou)
+  BaixarQrPlaca.disabled = !achou
+  QrAviso.textContent = !codigo ? 'Escolha uma placa para ver o QR.' : achou ? '' : 'Placa não encontrada.'
+
+  if (!achou) return
+
+  // o código já existe na lista; se o svg falhar, o aviso explica o motivo
+  try {
+    QrPrevia.innerHTML = criarSvgQr(codigo)
+  } catch (erro) {
+    QrAviso.textContent = `Sem prévia do QR: ${erro.message}`
   }
 }
 
 // ----- Backup (CSV) -----
+function mostrarBackup() {
+  let ultimo = null
+
+  try {
+    ultimo = localStorage.getItem('ultimoBackup')
+  } catch (erro) {
+    // sem armazenamento disponível: só não mostra a data do último backup
+  }
+
+  TotalBackup.textContent = placas.length
+  AvisoLimite.classList.toggle('oculto', placas.length < 1000)
+  UltimoBackup.textContent = ultimo
+    ? `Último backup baixado neste navegador: ${formatarData(ultimo)}`
+    : 'Nenhum backup baixado neste navegador ainda.'
+}
+
 function campoCsv(valor) {
   let texto = valor == null ? '' : String(valor)
 
@@ -779,6 +862,14 @@ async function exportarPlacas() {
   // BOM no começo e ponto e vírgula: o Excel em português abre com acentos e colunas certas
   baixarArquivo(`placas-${hoje()}.csv`, new Blob(['\ufeff' + linhas.join('\r\n')], {type: 'text/csv;charset=utf-8'}))
 
+  try {
+    localStorage.setItem('ultimoBackup', hoje())
+  } catch (erro) {
+    // sem armazenamento disponível: o backup foi baixado do mesmo jeito
+  }
+
+  mostrarBackup()
+
   if (dados.length >= 1000) {
     avisar('Atenção: o limite da consulta é 1000 placas, o backup pode estar incompleto.', true)
     return
@@ -796,6 +887,29 @@ function nivelDaSessao() {
   } catch (erro) {
     return null
   }
+}
+
+function emailDaSessao() {
+  // o e-mail vem no próprio token da sessão
+  try {
+    const carga = sessao.token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    return JSON.parse(atob(carga)).email || ''
+  } catch (erro) {
+    return ''
+  }
+}
+
+// ----- Configurações (vista): só mostra o que a sessão já informa -----
+function mostrarConfig() {
+  if (!sessao) return
+
+  const nivel = nivelDaSessao()
+  const validade = new Date(sessao.expira).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})
+
+  CfgEmail.textContent = emailDaSessao() || '—'
+  CfgDuasEtapas.textContent = nivel == 'aal2' ? 'Ativa' : 'Não verificada'
+  CfgNivel.textContent = nivel == 'aal2' ? 'aal2 (senha e código do app)' : nivel || '—'
+  CfgSessao.textContent = `Renova sozinha; o acesso atual vale até ${validade}`
 }
 
 async function etapaDeAcesso() {
@@ -971,6 +1085,8 @@ AtalhoNovaPlaca.addEventListener('click', () => abrirEditor(''))
 AtalhoLote.addEventListener('click', abrirLote)
 AtalhoEstoque.addEventListener('click', () => irParaVista('estoque')) // irParaVista vem do navegacao.js
 BuscaEstoque.addEventListener('input', mostrarEstoque)
+QrCodigo.addEventListener('input', atualizarPreviaQr)
+BaixarQrPlaca.addEventListener('click', () => baixarQrDaLinha(QrCodigo.value.trim().toLowerCase()))
 CancelarLote.addEventListener('click', () => DialogoLote.close())
 FormLote.addEventListener('submit', gerarLote)
 Cancelar.addEventListener('click', fecharEditor)

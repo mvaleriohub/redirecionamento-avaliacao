@@ -153,18 +153,6 @@
                         <button type="button" data-filtro="inativas" aria-pressed="false">Inativas <span>0</span></button>
                         <button type="button" data-filtro="todas" aria-pressed="false">Todas <span>0</span></button>
                     </div>
-                    <details id="maisacoes">
-                        <summary>Mais ações</summary>
-                        <div>
-                            <select id="formatoQr" aria-label="Formato do QR">
-                                <option value="svg">QR em SVG</option>
-                                <option value="png">QR em PNG</option>
-                            </select>
-                            <button type="button" id="baixarLote" class="secundario">Baixar QRs da lista (ZIP)</button>
-                            <button type="button" id="exportarCsv" class="secundario">Exportar backup (CSV)</button>
-                            <p id="destinoQr"></p>
-                        </div>
-                    </details>
                     <div id="tabela">
                         <div id="cabecalholista" aria-hidden="true">
                             <span>Código</span>
@@ -188,21 +176,58 @@
                     <div id="codigosEstoque"></div>
                 </section>
                 <section class="vista oculto" data-vista="qr">
-                    <div class="vazio">
-                        <p>Em breve</p>
-                        <p>Por enquanto, placas, lotes, QRs e backup ficam em <a href="#placas" data-vista="placas">Placas</a>.</p>
+                    <div id="paineisqr">
+                        <div class="caixa">
+                            <h2>QR de uma placa</h2>
+                            <div class="campo">
+                                <label for="qrCodigo">Código da placa</label>
+                                <input type="text" id="qrCodigo" list="codigosQr" placeholder="Digite ou escolha o código" autocomplete="off" autocapitalize="off">
+                                <datalist id="codigosQr"></datalist>
+                            </div>
+                            <p id="qrAviso" class="subtitulo"></p>
+                            <div id="qrPrevia" class="oculto"></div>
+                            <div class="rodape">
+                                <select id="formatoQr" aria-label="Formato do QR">
+                                    <option value="svg">SVG</option>
+                                    <option value="png">PNG</option>
+                                </select>
+                                <button type="button" id="baixarQrPlaca" disabled>Baixar QR</button>
+                            </div>
+                        </div>
+                        <div class="caixa">
+                            <h2>QRs em lote (ZIP)</h2>
+                            <p class="subtitulo">Um arquivo ZIP com um QR por placa, no formato escolhido ao lado, com o código escrito embaixo.</p>
+                            <select id="escopoZip" aria-label="Quais placas incluir">
+                                <option value="lote">Em estoque</option>
+                                <option value="ativas">Ativas</option>
+                                <option value="inativas">Inativas</option>
+                                <option value="todas">Todas</option>
+                            </select>
+                            <button type="button" id="baixarLote">Baixar QRs (ZIP)</button>
+                        </div>
                     </div>
+                    <p id="destinoQr"></p>
                 </section>
                 <section class="vista oculto" data-vista="backup">
-                    <div class="vazio">
-                        <p>Em breve</p>
-                        <p>Por enquanto, placas, lotes, QRs e backup ficam em <a href="#placas" data-vista="placas">Placas</a>.</p>
+                    <div class="caixa">
+                        <h2>Backup das placas</h2>
+                        <p class="subtitulo">Baixa todas as placas em um arquivo CSV, que abre no Excel. Guarde uma cópia de tempos em tempos.</p>
+                        <p><strong id="totalBackup">0</strong> placas serão exportadas</p>
+                        <p id="ultimoBackup" class="subtitulo"></p>
+                        <p id="avisoLimite" class="atencao oculto">A consulta traz no máximo 1000 placas. Com esse total o backup pode sair incompleto.</p>
+                        <button type="button" id="exportarCsv">Baixar backup (CSV)</button>
                     </div>
                 </section>
                 <section class="vista oculto" data-vista="config">
-                    <div class="vazio">
-                        <p>Em breve</p>
-                        <p>Por enquanto, placas, lotes, QRs e backup ficam em <a href="#placas" data-vista="placas">Placas</a>.</p>
+                    <div class="caixa">
+                        <h2>Conta e segurança</h2>
+                        <dl id="dadosConfig">
+                            <div><dt>E-mail</dt><dd id="cfgEmail">—</dd></div>
+                            <div><dt>Verificação em duas etapas</dt><dd id="cfgDuasEtapas">—</dd></div>
+                            <div><dt>Nível da sessão</dt><dd id="cfgNivel">—</dd></div>
+                            <div><dt>Sessão</dt><dd id="cfgSessao">—</dd></div>
+                        </dl>
+                        <p class="subtitulo">Perdeu o celular do autenticador? Use a chave guardada no gerenciador de senhas para configurar outro.</p>
                     </div>
                 </section>
                 <dialog id="gaveta" aria-labelledby="tituloEditor">
