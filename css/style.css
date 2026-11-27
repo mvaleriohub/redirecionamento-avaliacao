@@ -491,7 +491,12 @@ body.painel:has(#painel:not(.oculto)) > main {
 }
 
 #painel > #menu > .marca {
-    padding: 0 12px;
+    gap: 5px;
+    padding: 0 6px;
+}
+
+#painel > #menu > .marca > svg {
+    flex: 0 0 auto;
 }
 
 #painel > #menu > .marca > span {
@@ -507,12 +512,16 @@ body.painel:has(#painel:not(.oculto)) > main {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 9px 12px;
+    padding: 9px 11px;
     font-weight: 500;
     text-decoration: none;
     border-radius: 8px;
     color: var(--font-color2);
     transition: background 0.15s ease, color 0.15s ease;
+}
+
+#painel > #menu > nav > a > span {
+    color: inherit;
 }
 
 #painel > #menu > nav > a > svg {
@@ -1219,7 +1228,14 @@ h2#tituloEditor,
     margin-bottom: 12px;
 }
 
+#resumoestoque > p {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
 #resumoestoque > p > strong {
+    line-height: 1;
     font-size: 28px;
     font-weight: 600;
     letter-spacing: -0.02em;
